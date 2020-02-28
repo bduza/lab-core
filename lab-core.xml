@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<TriggerPackage>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>Toolbox</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+		</TriggerGroup>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>Core</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+		</TriggerGroup>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>Sandbox</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="yes" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Name List Capture</name>
+				<script>--display(string.split( multimatches[3][2], ', ') )</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>1</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Enemies of the City</string>
+					<string>1</string>
+					<string>^(.+)$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+					<integer>5</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
+	</TriggerPackage>
+	<TimerPackage />
+	<AliasPackage>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>Toolbox</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>display table</name>
+				<script>assert(loadstring("display(" .. matches[2] .. ")"))()
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^@(.+)$</regex>
+			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>Core</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>Core Help/Show</name>
+				<script>lab.core.showPlugins()</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^core$</regex>
+			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>Sandbox</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>test check directory</name>
+				<script>if not lfs.chdir([[C:\Users\brett\.config\mudlet\profiles\GUIframe/lab-core]])
+then print('directory fail')
+			lfs.mkdir([[C:\Users\brett\.config\mudlet\profiles\GUIframe/lab-core]])
+else print('sweet success')
+end</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^chkdir$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>^dload$</name>
+				<script>local savetofilename = '/lab-core.xml'
+local savetodir = '/lab-core'
+local saveto = getMudletHomeDir()..savetodir..savetofilename
+
+
+if not lfs.chdir( getMudletHomeDir() .. savetodir ) then lfs.mkdir(getMudletHomeDir() .. savetodir) else print("nah we're good" )end
+
+local url = "https://raw.githubusercontent.com/bduza/mudlet/master/lab-core.xml"
+downloadFile(saveto, url)
+cecho("&lt;white&gt;Downloading &lt;green&gt;"..url.."&lt;white&gt; to &lt;green&gt;"..saveto.."\n")
+
+
+
+
+registerAnonymousEventHandler(
+  "sysDownloadDone",
+  function(_, filename)
+		cecho("&lt;white&gt;...  &lt;green&gt;Download complete. ")
+    if filename ~= saveto then
+      return true -- keep the event handler since this was not our file
+    end
+		cecho("&lt;white&gt;...  &lt;green&gt;Installing module. ")
+		if not getModulePath('lab-core') then installModule(saveto)
+		else reloadModule('lab-core')
+		end
+    --os.remove(b)
+  end,
+  true
+)
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^dload$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>Text Bar</name>
+				<script>lab.tbar.drawC('50%', 'top')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^draw tbar$</regex>
+			</Alias>
+		</AliasGroup>
+	</AliasPackage>
+	<ActionPackage />
+	<ScriptPackage>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>Core</name>
+			<packageName></packageName>
+			<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>Core Information</name>
+				<packageName></packageName>
+				<script>lab = lab or {}
+lab.core = lab.core or {}
+lab.core.url = 'https://raw.githubusercontent.com/bduza/mudlet/master'
+lab.core.plugins = {
+	['lab-core'] = {desc = 'This collection of scripts.'},
+	['lab-chancap'] = {desc = 'Triggerless, GMCP channel capture for GUIframe.'},
+	['lab-mapper'] = {desc = 'Inline mapper for GUIframe'},
+	['lab-titlebar'] = {desc = 'Titlebar for GUIframe top zone'},
+	['lab-abilitybar'] = {desc = 'Ability bar for GUIframe bottom zone'},
+	['lab-gaugebox'] = {desc = 'Configurable box for dynamic number of gauges including clickcallbacks'},
+	['lab-expect'] = {desc = 'Timeout script for flag variables. Includes cooldown timer module with optional UI elements.'},
+	['lab-cooldowns'] = {desc='Balance/CD manager, with optional UI elements using demonnic anitimers'},
+}
+
+function lab.core.showPlugins()
+	local cols = {bracket='&lt;green&gt;',edge='&lt;green&gt;', link='&lt;cyan&gt;', text='&lt;white&gt;',}
+	local width = 80
+	
+	--function to calculate filler characters
+	local calcfiller = lab.calcFiller
+	
+	-- Centre text with filler both sides:
+	local heading = function(text)
+		local filler = calcfiller(text, width/2+text:len()/2, '-')
+		cecho("\n%s%s%s%s%s%s" %{cols.edge, filler, cols.text, text, cols.edge, filler})
+	end
+	-- return text surrounded by square brackets
+	local bracket = function(text)
+		return "%s[%s%s%s]" %{cols.bracket,cols.text,text,cols.bracket}
+	end
+	-- function to show [plugin name]:   a short description...., [helplink] [installlink]
+	local showplugin = function(plugin)
+		local plen = string.len(plugin)+2
+		local desc = string.sub(lab.core.plugins[plugin]['desc'], 1, 38)	
+		cecho("\n%s:%s%s%s%s" %{bracket(plugin), calcfiller(plugin..':', 19, ' '), cols.text,desc, calcfiller(desc, 40, ' ') })
+		
+		cechoLink("  " .. bracket('INFO'), [[print('display detailed info for plugin')]], 'Click to open the info/help page for this plugin.', true)
+		cechoLink("  " .. bracket('Install'), [[print('download and install plugin. Will update if already installed.')]], 'Click to open the info/help page for this plugin.', true)
+
+	end
+	
+	
+	-- let's use it
+	cecho("\n%s%s" %{cols.edge, calcfiller('',width,'-')})
+	heading('  Lab Plugins Available  ')
+	cecho("\n%s%s" %{cols.edge, calcfiller('',width,'-')})
+
+	showplugin('lab-core')
+	showplugin('lab-mapper')
+	showplugin('lab-chancap')
+	local excluded = {['lab-core'] = true, ['lab-chancap'] = true, ['lab-mapper'] = true}
+	for name,info in pairs(lab.core.plugins) do
+		if not excluded[name] then
+			showplugin(name)
+		end
+	end
+	cecho("\n%s%s\n" %{cols.edge, calcfiller('',width,'-')})
+	
+	
+	
+	
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>Downloader</name>
+				<packageName></packageName>
+				<script>lab = lab or {}
+lab.core = lab.core or {}
+lab.core.url = 'https://raw.githubusercontent.com/bduza/mudlet/master'
+
+function lab.core.dload(plugin, repo)
+  if getProfileName() == 'Core' then
+    cecho('\n&lt;sienna&gt; This is the master core, no downloading modules here.');
+    return true
+  end
+  local savetofilename = '/' .. plugin .. '.xml'
+  local savetodir = '/lab-core'
+  local saveto = getMudletHomeDir() .. savetodir .. savetofilename
+  if not lfs.chdir(getMudletHomeDir() .. savetodir) then
+    lfs.mkdir(getMudletHomeDir() .. savetodir)
+  else
+    print("nah we're good")
+  end
+  local url = repo or lab.core.url
+  url = url .. savetofilename
+  downloadFile(saveto, url)
+  cecho("\n&lt;white&gt;Downloading &lt;green&gt;" .. url .. "&lt;white&gt; to &lt;green&gt;" .. saveto .. "\n")
+  registerAnonymousEventHandler(
+    "sysDownloadDone",
+    function(_, filename)
+      cecho("&lt;white&gt;...  &lt;green&gt;Download complete. ")
+      if filename ~= saveto then
+        return true
+        -- keep the event handler since this was not our file
+      end
+      cecho("&lt;white&gt;...  &lt;green&gt;Installing module. ")
+      if not getModulePath(plugin) then
+        installModule(saveto)
+      else
+        reloadModule(plugin)
+      end
+      --os.remove(b)
+    end,
+    true
+  )
+end</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
+	</ScriptPackage>
+	<KeyPackage>
+		<KeyGroup isActive="yes" isFolder="yes">
+			<name>Personal</name>
+			<packageName></packageName>
+			<script></script>
+			<command></command>
+			<keyCode>-1</keyCode>
+			<keyModifier>-1</keyModifier>
+		</KeyGroup>
+	</KeyPackage>
+	<HelpPackage>
+		<helpURL></helpURL>
+	</HelpPackage>
+</MudletPackage>

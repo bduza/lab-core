@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<TriggerPackage />
+	<TimerPackage />
+	<AliasPackage />
+	<ActionPackage />
+	<ScriptPackage />
+	<KeyPackage>
+		<KeyGroup isActive="yes" isFolder="yes">
+			<name>Macros</name>
+			<packageName></packageName>
+			<script></script>
+			<command></command>
+			<keyCode>-1</keyCode>
+			<keyModifier>-1</keyModifier>
+			<KeyGroup isActive="yes" isFolder="yes">
+				<name>Function Keys</name>
+				<packageName></packageName>
+				<script></script>
+				<command></command>
+				<keyCode>-1</keyCode>
+				<keyModifier>-1</keyModifier>
+				<Key isActive="yes" isFolder="no">
+					<name>F1</name>
+					<packageName></packageName>
+					<script>macro("F1")</script>
+					<command></command>
+					<keyCode>16777264</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F2</name>
+					<packageName></packageName>
+					<script>macro("F2")</script>
+					<command></command>
+					<keyCode>16777265</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F3</name>
+					<packageName></packageName>
+					<script>macro("F3")</script>
+					<command></command>
+					<keyCode>16777266</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F4</name>
+					<packageName></packageName>
+					<script>macro("F4")</script>
+					<command></command>
+					<keyCode>16777267</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F5</name>
+					<packageName></packageName>
+					<script>macro("F5")</script>
+					<command></command>
+					<keyCode>16777268</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F6</name>
+					<packageName></packageName>
+					<script>macro("F6")</script>
+					<command></command>
+					<keyCode>16777269</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F7</name>
+					<packageName></packageName>
+					<script>macro("F7")</script>
+					<command></command>
+					<keyCode>16777270</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F8</name>
+					<packageName></packageName>
+					<script>macro("F8")</script>
+					<command></command>
+					<keyCode>16777271</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F9</name>
+					<packageName></packageName>
+					<script>macro("F9")</script>
+					<command></command>
+					<keyCode>16777272</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F10</name>
+					<packageName></packageName>
+					<script>macro("F10")</script>
+					<command></command>
+					<keyCode>16777273</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F11</name>
+					<packageName></packageName>
+					<script>macro("F11")</script>
+					<command></command>
+					<keyCode>16777274</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>F12</name>
+					<packageName></packageName>
+					<script>macro("F12")</script>
+					<command></command>
+					<keyCode>16777275</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>alt + F1</name>
+					<packageName></packageName>
+					<script>macro("altF1")</script>
+					<command></command>
+					<keyCode>16777264</keyCode>
+					<keyModifier>134217728</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>alt + F2</name>
+					<packageName></packageName>
+					<script>macro("altF2")</script>
+					<command></command>
+					<keyCode>16777265</keyCode>
+					<keyModifier>134217728</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>alt + F3</name>
+					<packageName></packageName>
+					<script>macro("altF3")</script>
+					<command></command>
+					<keyCode>16777266</keyCode>
+					<keyModifier>134217728</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>alt + F4</name>
+					<packageName></packageName>
+					<script>macro("altF4")</script>
+					<command></command>
+					<keyCode>16777267</keyCode>
+					<keyModifier>134217728</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F5</name>
+					<packageName></packageName>
+					<script>macro("ctrlF5")</script>
+					<command></command>
+					<keyCode>16777268</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F1</name>
+					<packageName></packageName>
+					<script>macro("ctrlF1")</script>
+					<command></command>
+					<keyCode>16777264</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F2</name>
+					<packageName></packageName>
+					<script>macro("ctrlF2")</script>
+					<command></command>
+					<keyCode>16777265</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F3</name>
+					<packageName></packageName>
+					<script>macro("ctrlF3")</script>
+					<command></command>
+					<keyCode>16777266</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F4</name>
+					<packageName></packageName>
+					<script>macro("ctrlF4")</script>
+					<command></command>
+					<keyCode>16777267</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F6</name>
+					<packageName></packageName>
+					<script>macro("ctrlF6")</script>
+					<command></command>
+					<keyCode>16777269</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F7</name>
+					<packageName></packageName>
+					<script>macro("ctrlF7")</script>
+					<command></command>
+					<keyCode>16777270</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F8</name>
+					<packageName></packageName>
+					<script>macro("ctrlF8")</script>
+					<command></command>
+					<keyCode>16777271</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F9</name>
+					<packageName></packageName>
+					<script>macro("ctrlF9")</script>
+					<command></command>
+					<keyCode>16777272</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F10</name>
+					<packageName></packageName>
+					<script>macro("ctrlF10")</script>
+					<command></command>
+					<keyCode>16777273</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F11</name>
+					<packageName></packageName>
+					<script>macro("ctrlF11")</script>
+					<command></command>
+					<keyCode>16777274</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + F12</name>
+					<packageName></packageName>
+					<script>macro("ctrlF12")</script>
+					<command></command>
+					<keyCode>16777275</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F1</name>
+					<packageName></packageName>
+					<script>macro("shiftF1")</script>
+					<command></command>
+					<keyCode>16777264</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F2</name>
+					<packageName></packageName>
+					<script>macro("shiftF2")</script>
+					<command></command>
+					<keyCode>16777265</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F3</name>
+					<packageName></packageName>
+					<script>macro("shiftF3")</script>
+					<command></command>
+					<keyCode>16777266</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F4</name>
+					<packageName></packageName>
+					<script>macro("shiftF4")</script>
+					<command></command>
+					<keyCode>16777267</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F5</name>
+					<packageName></packageName>
+					<script>macro("shiftF5")</script>
+					<command></command>
+					<keyCode>16777268</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F6</name>
+					<packageName></packageName>
+					<script>macro("shiftF6")</script>
+					<command></command>
+					<keyCode>16777269</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F7</name>
+					<packageName></packageName>
+					<script>macro("shiftF7")</script>
+					<command></command>
+					<keyCode>16777270</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F8</name>
+					<packageName></packageName>
+					<script>macro("shiftF8")</script>
+					<command></command>
+					<keyCode>16777271</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F9</name>
+					<packageName></packageName>
+					<script>macro("shiftF9")</script>
+					<command></command>
+					<keyCode>16777272</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F10</name>
+					<packageName></packageName>
+					<script>macro("shiftF10")</script>
+					<command></command>
+					<keyCode>16777273</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F11</name>
+					<packageName></packageName>
+					<script>macro("shiftF11")</script>
+					<command></command>
+					<keyCode>16777274</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>shift + F12</name>
+					<packageName></packageName>
+					<script>macro("shiftF12")</script>
+					<command></command>
+					<keyCode>16777275</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+			</KeyGroup>
+			<KeyGroup isActive="yes" isFolder="yes">
+				<name>MiscMacros</name>
+				<packageName></packageName>
+				<script></script>
+				<command></command>
+				<keyCode>-1</keyCode>
+				<keyModifier>-1</keyModifier>
+				<Key isActive="no" isFolder="no">
+					<name>LastParry</name>
+					<packageName></packageName>
+					<script>setNextParry(lastLimbHit)</script>
+					<command></command>
+					<keyCode>92</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Opposite of last parry</name>
+					<packageName></packageName>
+					<script>setNextParry(oppLastLimbHit)</script>
+					<command></command>
+					<keyCode>93</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Parry head</name>
+					<packageName></packageName>
+					<script>setNextParry("head")</script>
+					<command></command>
+					<keyCode>91</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Ctrl+1 - DEfup</name>
+					<packageName></packageName>
+					<script>macro("ctrl1")</script>
+					<command></command>
+					<keyCode>49</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Control 2</name>
+					<packageName></packageName>
+					<script>cure_biles()</script>
+					<command></command>
+					<keyCode>50</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Ctrl + /</name>
+					<packageName></packageName>
+					<script>setVenomMode( "handaxe", "dartsvlock")</script>
+					<command></command>
+					<keyCode>47</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Ctrl + .&gt;</name>
+					<packageName></packageName>
+					<script>setVenomMode( "handaxe", "dartskiller")</script>
+					<command></command>
+					<keyCode>46</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Ctrl + ,&lt;</name>
+					<packageName></packageName>
+					<script>setVenomMode( "handaxe", "salvestack")</script>
+					<command></command>
+					<keyCode>44</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Control 3</name>
+					<packageName></packageName>
+					<script>macro3()</script>
+					<command></command>
+					<keyCode>51</keyCode>
+					<keyModifier>268435456</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Ctrl+Quoteleft</name>
+					<packageName></packageName>
+					<script>macro("ctrl`")</script>
+					<command></command>
+					<keyCode>96</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Quoteleft</name>
+					<packageName></packageName>
+					<script>macro("`")</script>
+					<command></command>
+					<keyCode>96</keyCode>
+					<keyModifier>0</keyModifier>
+				</Key>
+				<Key isActive="no" isFolder="no">
+					<name>Shift-Tilde</name>
+					<packageName></packageName>
+					<script>macro("shift`")</script>
+					<command></command>
+					<keyCode>126</keyCode>
+					<keyModifier>33554432</keyModifier>
+				</Key>
+			</KeyGroup>
+			<KeyGroup isActive="yes" isFolder="yes">
+				<name>Keypad</name>
+				<packageName></packageName>
+				<script></script>
+				<command></command>
+				<keyCode>-1</keyCode>
+				<keyModifier>-1</keyModifier>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 8</name>
+					<packageName></packageName>
+					<script>move("n")</script>
+					<command></command>
+					<keyCode>56</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 9</name>
+					<packageName></packageName>
+					<script>move("ne")</script>
+					<command></command>
+					<keyCode>57</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 6</name>
+					<packageName></packageName>
+					<script>move("e")</script>
+					<command></command>
+					<keyCode>54</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 3</name>
+					<packageName></packageName>
+					<script>move("se")</script>
+					<command></command>
+					<keyCode>51</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 2</name>
+					<packageName></packageName>
+					<script>move("s")</script>
+					<command></command>
+					<keyCode>50</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 1</name>
+					<packageName></packageName>
+					<script>move("sw")</script>
+					<command></command>
+					<keyCode>49</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 4</name>
+					<packageName></packageName>
+					<script>move("w")</script>
+					<command></command>
+					<keyCode>52</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key 7</name>
+					<packageName></packageName>
+					<script>move("nw")</script>
+					<command></command>
+					<keyCode>55</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key SUB</name>
+					<packageName></packageName>
+					<script>move("up")</script>
+					<command></command>
+					<keyCode>45</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key ADD</name>
+					<packageName></packageName>
+					<script>move("down")</script>
+					<command></command>
+					<keyCode>43</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>key5 - look/panic</name>
+					<packageName></packageName>
+					<script>move("look")</script>
+					<command></command>
+					<keyCode>53</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>key DIV</name>
+					<packageName></packageName>
+					<script>move("in")</script>
+					<command></command>
+					<keyCode>47</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key MULT</name>
+					<packageName></packageName>
+					<script>move("out")</script>
+					<command></command>
+					<keyCode>42</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key + DEC</name>
+					<packageName></packageName>
+					<script>move("keydec")</script>
+					<command></command>
+					<keyCode>46</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>Key + 0/INS</name>
+					<packageName></packageName>
+					<script>move("keyins")
+</script>
+					<command></command>
+					<keyCode>48</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+			</KeyGroup>
+			<KeyGroup isActive="yes" isFolder="yes">
+				<name>Ctrl + Numbers</name>
+				<packageName></packageName>
+				<script></script>
+				<command></command>
+				<keyCode>-1</keyCode>
+				<keyModifier>-1</keyModifier>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 1</name>
+					<packageName></packageName>
+					<script>macro('ctrl1')</script>
+					<command></command>
+					<keyCode>49</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 2</name>
+					<packageName></packageName>
+					<script>macro('ctrl2')</script>
+					<command></command>
+					<keyCode>50</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 3</name>
+					<packageName></packageName>
+					<script>macro('ctrl3')</script>
+					<command></command>
+					<keyCode>51</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 4</name>
+					<packageName></packageName>
+					<script>macro('ctrl4')</script>
+					<command></command>
+					<keyCode>52</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 5</name>
+					<packageName></packageName>
+					<script>macro('ctrl5')</script>
+					<command></command>
+					<keyCode>53</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 6</name>
+					<packageName></packageName>
+					<script>macro('ctrl6')</script>
+					<command></command>
+					<keyCode>54</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 7</name>
+					<packageName></packageName>
+					<script>macro('ctrl7')</script>
+					<command></command>
+					<keyCode>55</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 8</name>
+					<packageName></packageName>
+					<script>macro('ctrl8')</script>
+					<command></command>
+					<keyCode>56</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 9</name>
+					<packageName></packageName>
+					<script>macro('ctrl9')</script>
+					<command></command>
+					<keyCode>57</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>ctrl + 0</name>
+					<packageName></packageName>
+					<script>macro('ctrl0')</script>
+					<command></command>
+					<keyCode>48</keyCode>
+					<keyModifier>67108864</keyModifier>
+				</Key>
+			</KeyGroup>
+		</KeyGroup>
+	</KeyPackage>
+	<HelpPackage>
+		<helpURL></helpURL>
+	</HelpPackage>
+</MudletPackage>

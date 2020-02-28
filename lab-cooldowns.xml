@@ -1,0 +1,6124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<TriggerPackage>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>Balance</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="yes" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Balance Used</name>
+				<script>local time = tonumber(multimatches[2][2])
+--print('time: ' .. time)
+
+fg('DodgerBlue')
+setUnderline(true)
+echo(' (%ss)' %{tostring(time)})
+resetFormat()
+
+bal:spend(time)
+time = time - 0.5
+
+
+
+pvp.balchasertimer = tempTimer(time, function() raiseEvent('balchaser') end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Balance used:</string>
+					<string>^Balance used\: (\d+\.\d+)s\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Bal back</name>
+				<script>bal:balback()
+selectCurrentLine()
+fg('DodgerBlue')
+setUnderline(true)
+setOverline(true)
+replace('   &gt;&gt;&gt;&gt;&gt;   Balance   &lt;&lt;&lt;&lt;&lt;     &gt;&gt;&gt;&gt;&gt;   Balance   &lt;&lt;&lt;&lt;&lt;   &gt;&gt;&gt;&gt;&gt;   Balance   &lt;&lt;&lt;&lt;&lt;   &gt;&gt;&gt;&gt;&gt;   Balance   &lt;&lt;&lt;&lt;&lt;')
+resetFormat()
+deselect()
+pvp.override = false
+raiseEvent('balance regained')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You have recovered your balance.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>3</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
+	</TriggerPackage>
+	<TimerPackage />
+	<AliasPackage>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>blank</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+		</AliasGroup>
+	</AliasPackage>
+	<ActionPackage />
+	<ScriptPackage>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>BalSys</name>
+			<packageName></packageName>
+			<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+			<eventHandlerList />
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>Expect/Balsys</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>Expect</name>
+					<packageName></packageName>
+					<script>balsys = {}
+balsys.__index = balsys
+
+function balsys:create(name, default, cd, timeout)
+   local self = {}             		-- our new object
+   setmetatable(self,balsys) 		-- make balsys handle lookup
+   self.name = name      			-- initialize our object
+   self.bal = default or true
+   self.cd = cd or false
+   self.timeout = timeout or 0.5
+	 self.timer = false
+
+   return self
+end
+
+function balsys:expect()
+   self.bal = false
+   --print(self.name .. ' is: ' .. tostring(self.bal) ..  ' Begin ' .. self['timeout'] .. 's timeout timer.')
+	 self.timer = tempTimer(self.timeout, function()
+	 		self.bal = true
+   		--print("timeout expired, resetting " .. self.name .. ': ' .. tostring(self.bal)) 
+	 end)
+end
+
+function balsys:spend(time)
+	self.bal = false
+	--print(self.name .. ' is: ' .. tostring(self.bal) ..  ' definitely lost, killing the timeout')
+	if self.timer then killTimer(self.timer) end
+	self:startCD(time or false)
+	raiseEvent('cooldown updated', self.name, 'spent')
+end
+
+function balsys:balback(amount)
+   self.bal = true
+	 if demonnic.anitimer.timers[self.name] then
+	 	demonnic.anitimer:stop(self.name)
+	end
+   --print(self.name .. ' is: ' .. tostring(self.bal) ..  ' killing all timers')
+	 raiseEvent('balback', self.name)
+	 raiseEvent('cooldown updated', self.name, 'balback')
+end
+
+function balsys:startCD(time)
+	
+	if not self.cd then return false end
+	if not time then return false end
+	
+	local time = time or tonumber(self.cd)
+	
+	--print(self.name .. ' is: ' .. tostring(self.bal) ..  ' starting the CD: ' .. tostring(self.cd))
+	local name = self.name
+	
+	if not demonnic.anitimer then 
+		expandAlias([[lua local a="https://raw.githubusercontent.com/demonnic/animatedtimers/master/animatedtimers-3.1.xml"function d(b,c)if not c:find("AnimatedTimers",1,true)then return end installPackage(c)os.remove(c)cecho("&lt;lime_green&gt;Package installed!\n")end registerAnonymousEventHandler("sysDownloadDone","d")downloadFile(getMudletHomeDir()..(a:ends("xml")and"/AnimatedTimers.xml"or"/AnimatedTimers.zip"),a)]])
+ 		return false
+	end
+	
+	demonnic.anitimer:new(name, {x = 0, y="50%", height = 20, width = "100%"}, time, {
+	container = lab.cdtimers.tbox, -- container needs to be a VBOX geyser object
+	showTime = true, 
+	timerCaption = name, 
+	cssFront = balsys.myCss1, cssBack = balsys.myCss2})
+	
+end
+
+function balsys:ready()
+	return self.bal
+end
+
+function  balsys:getTime()
+	return demonnic.anitimer:getTime(self.name)
+end
+
+
+-- create and use an balsys
+eq = balsys:create('eq', true,false, 2)
+</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>Timer VBOX</name>
+					<packageName></packageName>
+					<script>lab  = lab or {}
+lab.cdtimers = {}
+
+function lab.cdtimers.draw()
+  lab.cdtimers.tbox = Geyser.VBox:new({
+    name = "lab.CDTimerBox",
+  	x='5px', y='5px',
+  	height='-5px', width='-5px',
+  })
+	GUIframe.addWindow(lab.cdtimers.tbox,"Cooldowns","bottomright")
+	--lab.cdtimers.tbox:setStyleSheet(lab.BoxCSS:getCSS())
+	--registerAnonymousEventHandler('sysLoadEvent', function() if GUIframe then GUIframe.addWindow(lab.cdtimers.tbox,"Cooldowns","topleft") end end )
+end
+
+
+lab.cdtimers.draw()</script>
+					<eventHandlerList />
+					<ScriptGroup isActive="yes" isFolder="yes">
+						<name>Toolbox</name>
+						<packageName></packageName>
+						<script>
+function str(s)
+	return tostring(s)
+end
+
+function int(s)
+	return tonumber(s)
+end
+
+	topercent = function(num)
+		return tostring(num) .. '%'
+	end
+	frompercent = function(pc)
+		return tonumber(string.sub(pc, 1, -2))
+	end
+
+function mathpercent(pc, operator, operand)
+	local pc = frompercent(pc)
+	local operand = operand
+	if type(operand) == 'string' then operand = frompercent(operand) end
+	local result = 0
+	
+	if operator == '*' then
+		result = pc * operand
+	elseif operator == '/' then
+		result = pc / operand
+	elseif operator == '+' then
+		result = pc + operand
+	elseif operator == '-' then
+		result = pc - operand
+	end
+	
+	return topercent(result)
+
+end
+
+
+
+
+
+--[[
+
+
+		
+	
+]]--</script>
+						<eventHandlerList />
+						<Script isActive="yes" isFolder="no">
+							<name>guiframe</name>
+							<packageName></packageName>
+							<script>-- Jor'Mox's GUIframe Script
+-- 3/07/2019
+-- v1.4.2
+
+-- To resize frames or move tabs, right click and drag either the resize label or the tab
+-- until the desired result is achieved.
+
+-- To add a window to a frame for the script to manage, use the
+-- GUIframe.addWindow(window, name, container, hideText) function, where the window
+-- variable contains the Geyser object you want to add, the name variable contains
+-- the name you want it to be referred to as, which also is used as the text printed
+-- on the associated tab that is created, the container variable is a string containing
+-- one of the following: bottom, top, topleft, topright, bottomleft, bottomright,
+-- and the hideText variable is an optional boolean which, if true, prevents text being
+-- written on the tab for this window.
+
+-- To remove a window from GUIframe, use the GUIframe.removeWindow(name, container)
+-- function, where the name variable is the same name you gave the window when adding it,
+-- and the optional container variable is a string specifying which container to remove
+-- the window from. If no container is specified, the window is removed regardless of
+-- which container it is in.
+
+-- Resizing of frames can be enabled or disabled using the GUIframe.enable(side) and
+-- GUIframe.disable(side, hide) functions respectively. If the second argument to
+-- GUIframe.disable is false, then the entire set of frames on that side is hidden, and
+-- the border is adjusted as if that side had be resized to zero.
+
+-- To save and load settings, use the GUIframe.saveSettings() and
+-- GUIframe.loadSettings(redraw) functions. If the redraw argument is true, the border
+-- background color is changed to black to force the area of the borders to be redrawn.
+-- Additionally, the GUIframe.reinitialize() function can be used to force the script to
+-- initialize itself again, going back to default settings.
+
+-- To activate a tab without it being clicked, use the GUIframe.activate(name) function.
+-- And to apply a stylesheet to a tab that is different from the default stylesheet, use
+-- the GUIframe.styleTab(name, style) function, where the style variable contains a string
+-- with the CSS to be applied. Since tabs are styled only when created or when this
+-- function is used, there should be no concern with this styling being overwritten.
+
+GUIframe = GUIframe or {}
+
+local mainW, mainH = getMainWindowSize()
+local halfW, halfH = math.floor(mainW/2), math.floor(mainH/2)
+
+GUIframe.configs = GUIframe.configs or {}
+
+GUIframe.defaults = {
+    tabHeight = 20,
+    tabHeight = 20,
+    tabStyle = [[
+        background-color: rgba(150,150,150,100);
+        border-width: 2px;
+        border-style: outset;
+        border-color: rgba(50,50,50,200);
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        margin-right: 1px;
+        margin-left: 1px;
+        qproperty-alignment: 'AlignCenter | AlignCenter';]],
+    tabEchoStyle = '&lt;center&gt;&lt;p style="font-size:14px; color = white"&gt;',
+    leftStartWidth = 50,
+    leftStartHeight = halfH,
+    rightStartWidth = 50,
+    rightStartHeight = halfH,
+    topStartHeight = 50,
+    bottomStartHeight = 50,
+    resizeHeight = 30,
+    resizeWidth = 30,
+    resizeHoverImage = "/imgs/blue_arrows.png",
+    resizeRestImage = "/imgs/blue_arrows_30t.png",
+    borderOffset = 5,
+}
+
+GUIframe.windows = GUIframe.windows or {}
+GUIframe.tabs = GUIframe.tabs or {}
+GUIframe.tabCoords = GUIframe.tabCoords or {}
+GUIframe.sides = GUIframe.sides or {left = 'enabled', right = 'enabled', top = 'enabled', bottom = 'enabled'}
+
+local resize_style = "border-image: url(%s%s);"
+
+local configs = table.update(GUIframe.defaults, GUIframe.configs)
+local tabsInfo, containerInfo, resizeInfo
+
+local container_names = {'topLeftContainer', 'bottomLeftContainer', 'topRightContainer',
+    'bottomRightContainer', 'bottomContainer', 'topContainer'}
+local tab_names = {'topLeftTabs', 'topRightTabs', 'bottomLeftTabs', 'bottomRightTabs'}
+local resizeLabels = {'resizeLeft', 'resizeRight', 'resizeTop', 'resizeBottom'}
+local sides = {"top","bottom","left","right"}
+local side_containers = {
+    left = {"topLeftContainer","bottomLeftContainer","topLeftTabs","bottomLeftTabs"},
+    right = {"topRightContainer","bottomRightContainer","topRightTabs","bottomRightTabs"},
+    top = {"topContainer"},
+    bottom = {"bottomContainer"}
+}
+
+local function get_window_coords(win, update) -- gets coords for window, stores data in tabCoords table as needed
+    local x, y = win:get_x(), win:get_y()
+    local w, h = win:get_width(), win:get_height()
+    if update then
+        GUIframe.tabCoords[win.name]  = {x = x, y = y, w = w, h = h}
+    end
+    return x, y, w, h
+end
+
+local function check_overlap(tab, x, y) -- checks to see if given coords overlap tab or tab container
+    if type(tab) == "string" then tab = GUIframe[tab] or GUIframe.tabs[tab] end
+    if tab.hidden or tab.auto_hidden then return false end
+    local info = GUIframe.tabCoords[tab.name]
+    local x1, y1 = info.x, info.y
+    local x2, y2 = x1 + info.w, y1 + info.h
+    return (x &gt;= x1 and x &lt;= x2 and y &gt;= y1 and y &lt;= y2)
+end
+
+local function update_tab(tab, x, y, w, h) -- resizes and moves tab and updates tab coords table
+    tab:move(x, y)
+    tab:resize(w,h)
+    local info = GUIframe.tabCoords[tab.name] or {}
+    info.x, info.y = tab:get_x(), tab:get_y()
+    info.w, info.h = tab:get_width(), tab:get_height()
+    if table.contains(tab_names, tab.name) then
+        info.container = true
+    end
+    GUIframe.tabCoords[tab.name] = info
+end
+
+local function get_containers(pos)
+    if type(pos) == "table" then pos = pos.name end
+    for _,w in ipairs({'right','left','container','tabs'}) do
+        pos = pos:gsub(w,w:title())
+    end
+    local con, tab
+    if string.find(pos,"Container") then
+        con = GUIframe[pos]
+        if not con then return end
+        tabs = con.tabs
+    elseif string.find(pos,"Tabs") then
+        tabs = GUIframe[pos]
+        if not tab then return end
+        con = tabs.con
+    else
+        con = GUIframe[pos.."Container"]
+        tabs = GUIframe[pos.."Tabs"]
+    end
+    return con, tabs
+end
+
+local function config()
+    configs = table.update(GUIframe.defaults, GUIframe.configs)
+    GUIframe.windows = {}
+    GUIframe.tabCoords = {}
+
+    tabsInfo = {
+        topLeftTabs = {name = 'topLeftTabs', x = 0, y = 0, width = configs.leftStartWidth,
+            height = configs.tabHeight},
+        bottomLeftTabs = {name = 'bottomLeftTabs', x = 0, y = configs.leftStartHeight,
+            width = configs.leftStartWidth, height = configs.tabHeight},
+        topRightTabs = {name = 'topRightTabs', x = mainW - configs.rightStartWidth, y = 0,
+            width = configs.rightStartWidth, height = configs.tabHeight},
+        bottomRightTabs = {name = 'bottomRightTabs', x = mainW - configs.rightStartWidth,
+            y = configs.rightStartHeight, width = configs.rightStartWidth, height = configs.tabHeight},
+    }
+    containerInfo = {
+        topLeftContainer = {name = 'topLeftContainer', x = 0, y = configs.tabHeight,
+            width = configs.leftStartWidth, height = configs.leftStartHeight - configs.tabHeight},
+        bottomLeftContainer = {name = 'bottomLeftContainer', x = 0, y = configs.leftStartHeight + configs.tabHeight,
+            width = configs.leftStartWidth, height = configs.leftStartHeight - configs.tabHeight},
+        topRightContainer = {name = 'topRightContainer', x = mainW - configs.rightStartWidth,
+            y = configs.tabHeight, width = configs.rightStartWidth,
+            height = configs.rightStartHeight - configs.tabHeight},
+        bottomRightContainer = {name = 'bottomRightContainer', x = mainW - configs.rightStartWidth,
+            y = configs.rightStartHeight + configs.tabHeight, width = configs.rightStartWidth,
+            height = configs.rightStartHeight - configs.tabHeight},
+        bottomContainer = {name = 'bottomContainer', x = configs.leftStartWidth,
+            y = mainH - configs.bottomStartHeight, height = configs.bottomStartHeight,
+            width = mainW - configs.leftStartWidth - configs.rightStartWidth},
+        topContainer = {name = 'topContainer', x = configs.leftStartWidth, y = 0, height = configs.topStartHeight,
+            width = mainW - configs.leftStartWidth - configs.rightStartWidth}
+    }
+    resizeInfo = {
+        resizeLeft = {name = 'resizeLeft', x = configs.leftStartWidth,
+            y = configs.leftStartHeight - configs.resizeHeight / 2, height = configs.resizeHeight,
+            width = configs.resizeWidth},
+        resizeRight = {name = 'resizeRight', x = configs.rightStartWidth - configs.resizeWidth,
+            y = configs.rightStartHeight - configs.resizeHeight / 2, height = configs.resizeHeight,
+            width = configs.resizeWidth},
+        resizeTop = {name = 'resizeTop', x = halfW - configs.resizeWidth / 2,
+            y = configs.topStartHeight, height = configs.resizeHeight, width = configs.resizeWidth},
+        resizeBottom = {name = 'resizeBottom', x = halfW - configs.resizeWidth / 2,
+            y = mainH - configs.bottomStartHeight - configs.resizeHeight, height = configs.resizeHeight,
+            width = configs.resizeWidth}
+    }
+
+    for name, cons in pairs(containerInfo) do
+        GUIframe[name] = Geyser.Container:new(cons)
+    end
+    for name, cons in pairs(tabsInfo) do
+        GUIframe[name] = Geyser.Container:new(cons)
+        local cname = name:gsub("Tabs","Container")
+        GUIframe[cname].tabs = GUIframe[name]
+        GUIframe[name].con = GUIframe[cname]
+    end
+    local style = resize_style
+    local path = getMudletHomeDir()
+    path = path:gsub("[\\/]","/")
+    configs.resizeRestImage = configs.resizeRestImage:gsub("[\\/]","/")
+    configs.resizeHoverImage = configs.resizeHoverImage:gsub("[\\/]","/")
+    local no_image
+    if not (io.exists(path .. configs.resizeHoverImage) and io.exists(path .. configs.resizeRestImage)) then
+        debugc("GUIframe: config: resize image(s) not found")
+        path = "255,20,147,"
+        style = "background-color: rgba(%s%s);"
+        no_image = true
+    end
+
+    for name, cons in pairs(resizeInfo) do
+        GUIframe[name] = Geyser.Label:new(cons)
+        GUIframe[name]:setColor(0,0,0,0)
+        GUIframe[name]:setStyleSheet(string.format(style, path, (no_image and "100") or configs.resizeRestImage))
+        GUIframe[name]:setOnEnter("GUIframe."..name..".setStyleSheet", GUIframe[name],
+            string.format(style, path, (no_image and "255") or configs.resizeHoverImage))
+        GUIframe[name]:setOnLeave("GUIframe."..name..".setStyleSheet", GUIframe[name],
+            string.format(style, path, (no_image and "100") or configs.resizeRestImage))
+        GUIframe[name]:setClickCallback("GUIframe.buttonClick", name)
+        GUIframe[name]:setReleaseCallback("GUIframe.buttonRelease", name)
+        GUIframe[name]:setMoveCallback("GUIframe.buttonMove", name)
+    end
+    setBorderLeft(configs.leftStartWidth + configs.borderOffset)
+    setBorderRight(configs.rightStartWidth + configs.borderOffset)
+    setBorderTop(configs.topStartHeight + configs.borderOffset)
+    setBorderBottom(configs.bottomStartHeight + configs.borderOffset)
+    GUIframe.initialized = true
+end
+
+local function deselectContainer(container, tabs)
+    -- hide all windows in container
+    for _, win in pairs(container.windowList) do
+        win:hide()
+        win.active = false
+    end
+    -- unhighlight all tabs in tabs container
+    if tabs then
+        for _, tab in pairs(tabs.windowList) do
+            local name = tab.name:gsub("Tab","")
+            local show = GUIframe.windows[name].showText
+            if show then
+                tab:echo(configs.tabEchoStyle..name)
+            end
+	    end
+	end
+end
+
+local function adjustTabs(tabs)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    -- remove duplicated window names
+    local found = {}
+    for k,v in ipairs(tabs.windows) do
+        if not table.contains(found,v) and tabs.windowList[v] and not tabs.windowList[v].isClicked then
+            table.insert(found,v)
+        end
+    end
+    -- calculate tab width and set height
+    local w, h = math.floor(100 / #tabs.windows), configs.tabHeight
+    local function wrap(num) return tostring(num) .. "%" end
+    -- resize and reposition all tabs
+    local shown, first
+    for k,v in ipairs(found) do
+        local tab = tabs.windowList[v]
+        if not first then first = v:gsub("Tab","") end
+        if not shown and tab.active then
+            shown = v
+        elseif tab.active then
+            tab.active = false
+        end
+        update_tab(tab, wrap(w * (k-1)), 0, wrap(w), h)
+    end
+    if first and not shown and GUIframe.windows[first] then GUIframe.windows[first]:show() end
+    tabs.space_pos = nil
+end
+
+local function reorderTabs(tabs, name, pos)
+    local windows = tabs.windows
+    while table.contains(windows, name) do
+        table.remove(windows, table.index_of(windows, name))
+    end
+    table.insert(windows, pos, name)
+end
+
+local function makeSpace(tabs, tab, pos)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    local windows = table.deepcopy(tabs.windows)
+    local space_pos = tabs.space_pos
+    local tab_pos = table.index_of(windows, tab.name)
+    -- calculate tab width and set height
+    local num_tabs = #windows + 1
+    if tab_pos then
+        num_tabs = num_tabs - 1
+        if pos &gt; tab_pos then pos = pos - 1 end
+        if pos == space_pos then pos = pos + 1 end
+    elseif space_pos and pos &gt;= space_pos then
+        pos = pos + 1
+    end
+    local w, h = math.floor(100 / num_tabs), configs.tabHeight
+    local function wrap(num) return tostring(num) .. "%" end
+    -- resize and reposition all tabs
+    if tab_pos then table.remove(windows,tab_pos) end
+    for k,v in ipairs(windows) do
+        if k &gt;= pos then
+            update_tab(tabs.windowList[v], wrap(w * k), 0, wrap(w), h)
+        else
+            update_tab(tabs.windowList[v], wrap(w * (k-1)), 0, wrap(w), h)
+        end
+    end
+    tabs.space_pos = pos
+end
+
+local function round(num,roundTo)
+	local b, r = math.modf(num/roundTo)
+	if r &gt;= 0.5 then
+		b = b + 1
+	end
+	return b * roundTo
+end
+
+local function setBorder(side, val)
+    local funcs = {left = setBorderLeft, right = setBorderRight, top = setBorderTop, bottom = setBorderBottom}
+    val = math.max(val,0)
+	funcs[side](val)
+end
+
+local function resizeContainers(side, w, h)
+    if table.contains({"left", "right"}, side) then
+        local info = {
+            left = {resize = "resizeLeft", cons = {"topLeftContainer","bottomLeftContainer"},
+                tabs = {"topLeftTabs","bottomLeftTabs"}, x = 0, w = w},
+            right = {resize = "resizeRight", cons = {"topRightContainer","bottomRightContainer"},
+                tabs = {"topRightTabs","bottomRightTabs"}, x = w, w = mainW - w}
+        }
+        info = info[side]
+        -- move and resize top, bottom and tab containers
+        update_tab(GUIframe[info.tabs[1]], info.x, 0, info.w, configs.tabHeight)
+        update_tab(GUIframe[info.tabs[2]], info.x, h, info.w, configs.tabHeight)
+        GUIframe[info.cons[1]]:resize(info.w, h - configs.tabHeight)
+        GUIframe[info.cons[1]]:move(info.x, configs.tabHeight)
+        GUIframe[info.cons[2]]:resize(info.w, mainH - h - configs.tabHeight)
+        GUIframe[info.cons[2]]:move(info.x, h + configs.tabHeight)
+        -- adjust border size
+        setBorder(side, info.w + configs.borderOffset)
+
+        -- adjust width of top and bottom containers
+        local x, y
+        x = (GUIframe.sides.left ~= "hidden" and GUIframe.topLeftContainer:get_width()) or 0
+        w = ((GUIframe.sides.right ~= "hidden" and GUIframe.topRightContainer:get_x()) or mainW) - x
+        for _, con in ipairs({GUIframe.topContainer, GUIframe.bottomContainer}) do
+            y, h = con:get_y(), con:get_height()
+            con:resize(w, h)
+            con:move(x, y)
+        end
+    elseif table.contains({"top", "bottom"}, side) then
+        local x = 0
+        w = mainW
+        if GUIframe.sides.left ~= "hidden" then
+            w = w - GUIframe.topLeftContainer:get_width()
+            x = GUIframe.topLeftContainer:get_width()
+        end
+        if GUIframe.sides.right ~= "hidden" then w = w - GUIframe.topRightContainer:get_width() end
+        local info = {top = {con = "topContainer", y = 0, h = h}, bottom = {con = "bottomContainer", y = h, h = mainH - h}}
+        local con = GUIframe[info[side].con]
+        con:resize(w, info[side].h)
+        con:move(x, info[side].y)
+        setBorder(side, info[side].h + configs.borderOffset)
+    end
+end
+
+local function refresh()
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    mainW, mainH = getMainWindowSize()
+    local rH, rW = configs.resizeHeight, configs.resizeWidth
+    local x, y, w
+    -- adjust bottom left and right container heights
+    for _, C in ipairs({GUIframe.bottomLeftContainer, GUIframe.bottomRightContainer}) do
+        C:resize(C:get_width(), mainH - C:get_y())
+    end
+    -- reposition right containers
+    w = GUIframe.topRightContainer:get_width()
+    for _, C in ipairs({GUIframe.topRightContainer, GUIframe.topRightTabs,
+        GUIframe.bottomRightContainer, GUIframe.bottomRightTabs}) do
+        C:move(mainW - w,C:get_y())
+    end
+    -- resize and reposition bottom and top containers
+    w, x = mainW, 0
+    if GUIframe.sides.left ~= "hidden" then
+        w = w - GUIframe.topLeftContainer:get_width()
+        x = GUIframe.topLeftContainer:get_width()
+    end
+    if GUIframe.sides.right ~= "hidden" then w = w - GUIframe.topRightContainer:get_width() end
+    for _, C in ipairs({GUIframe.topContainer, GUIframe.bottomContainer}) do
+        C:resize(w, C:get_height())
+        C:move(x, C.name == "topContainer" and 0 or mainH - C:get_height())
+    end
+    -- reposition resize labels
+    x, y = GUIframe.topLeftContainer:get_width(), GUIframe.bottomLeftTabs:get_y()
+    GUIframe.resizeLeft:move(x, y - rH / 2)
+    x, y = GUIframe.topRightContainer:get_x(), GUIframe.bottomRightTabs:get_y()
+    GUIframe.resizeRight:move(x - rW, y - rH / 2)
+    x = (GUIframe.topContainer:get_width() - rW) / 2
+    if GUIframe.sides.left ~= "hidden" then x = x + GUIframe.topLeftContainer:get_width() end
+    y = GUIframe.topContainer:get_height()
+    GUIframe.resizeTop:move(x, y)
+    y = GUIframe.bottomContainer:get_y()
+    GUIframe.resizeBottom:move(x, y - rH)
+end
+
+-- enables the resize label for the given side and shows all associated containers if hidden
+function GUIframe.enable(side)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    if not table.contains(sides,side) then error("GUIframe.enable: invalid side",2) end
+    local cons = side_containers[side]
+    for _, con in ipairs(cons) do
+        GUIframe[con]:show()
+        for _,win in pairs(GUIframe[con].windowList) do -- loop can be removed after Geyser fix comes in
+            if win.active then win:show() end
+        end
+    end
+    if table.contains({"left","right"}, side) then
+        setBorder(side, GUIframe[cons[1]]:get_width() + configs.borderOffset)
+    else
+        setBorder(side, GUIframe[cons[1]]:get_height() + configs.borderOffset)
+    end
+    GUIframe["resize"..side:title()]:show()
+    GUIframe.sides[side] = "enabled"
+    refresh()
+end
+
+-- disables and hides the resize label for the given side, and hides all associated containers if indicated
+function GUIframe.disable(side, hide)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    if not table.contains(sides,side) then error("GUIframe.disable: invalid side",2) end
+    local cons = side_containers[side]
+    GUIframe.sides[side] = "disabled"
+    if hide then
+        for _, con in ipairs(cons) do
+            GUIframe[con]:hide()
+            for _, win in pairs(GUIframe[con].windowList) do -- loop can be removed after Geyser fix comes in
+                if win.type == "mapper" then win:hide() end
+            end
+        end
+        local border = _G["setBorder"..side:title()]
+        border(0)
+        GUIframe.sides[side] = "hidden"
+    end
+    GUIframe["resize"..side:title()]:hide()
+    refresh()
+end
+
+-- adds a Geyser window or container to the given container, with a tab showing the given name if applicable
+function GUIframe.addWindow(window, name, container, hideText)
+    if not GUIframe.initialized then config() end
+    if type(container) == "table" then container = container.name end
+    local con, tabs = get_containers(container)
+    if not con then error("GUIframe.addWindow: invalid container name",2) end
+    if not name then error("GUIframe.addWindow: name argument required",2) end
+    -- remove window from any containers
+    for _, tcon in ipairs(container_names) do
+        if table.contains(GUIframe[tcon].windows, window.name) then
+            GUIframe.removeWindow(name, tcon)
+        end
+    end
+    deselectContainer(con,tabs)
+    -- add tab for window, if applicable
+    if tabs then
+        local showText = not hideText
+        window.showText = showText
+        local lbl = Geyser.Label:new({name = name.."Tab", x = 0, y = 0, width = 10, height = 10},tabs)
+        lbl:setStyleSheet(configs.tabStyle)
+        if showText then
+            lbl:echo(configs.tabEchoStyle.."&lt;b&gt;"..name)
+        end
+        lbl:setClickCallback("GUIframe.buttonClick", name)
+        lbl:setReleaseCallback("GUIframe.buttonRelease", name)
+        lbl:setMoveCallback("GUIframe.buttonMove", name)
+        GUIframe.tabs[name] = lbl
+        adjustTabs(tabs)
+    end
+    -- add window to container and set size and position
+    con:add(window)
+    window:resize("100%","100%")
+    window:move(0,0)
+    window:show()
+    GUIframe.windows[name] = window
+	raiseEvent("sysWindowResizeEvent")
+end
+
+-- removes a named Geyser window or container from the named container (using name given in GUIframe.addWindow)
+function GUIframe.removeWindow(name, container)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    if not container then container = GUIframe.windows[name].container end
+    local con, tabs = get_containers(container)
+
+    if not con or not table.contains(container_names, con.name) then
+        error("GUIframe.removeWindow: invalid container name",2)
+    end
+    if not name then error("GUIframe.removeWindow: name argument required",2) end
+    if tabs then
+        local lbl = tabs.windowList[name.."Tab"]
+        if lbl then
+            tabs:remove(lbl)
+            adjustTabs(tabs)
+            lbl:hide()
+        end
+    end
+    local window = GUIframe.windows[name]
+    con:remove(window)
+    window:hide()
+end
+
+-- saves the current GUI setup, including the size of the different containers and what windows go in which container
+function GUIframe.saveSettings()
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    local saveTbl = {}
+    local w, h = GUIframe.topLeftContainer:get_width(), GUIframe.bottomLeftTabs:get_y()
+    saveTbl.left = {w = w, h = h}
+    w, h = GUIframe.topRightContainer:get_width(), GUIframe.bottomRightTabs:get_y()
+    saveTbl.right = {w = w, h = h}
+    w, h = GUIframe.topContainer:get_width(), GUIframe.topContainer:get_height()
+    saveTbl.top = {w = w, h = h}
+    w, h = GUIframe.bottomContainer:get_width(), GUIframe.bottomContainer:get_height()
+    saveTbl.bottom = {w = w, h = h}
+
+    -- get added windows and containers they are assigned to
+    local windows = {}
+    local text = {}
+    for k,v in pairs(GUIframe.windows) do
+        local con = v.container.name
+        windows[con] = windows[con] or {}
+        table.insert(windows[con], k)
+        text[con] = text[con] or {}
+        text[con][k] = v.showText
+    end
+    -- reorder windows to match tab order for tabbed containers
+    for con, wins in pairs(windows) do
+        if con:find("Left") or con:find("Right") then
+            local tabs = GUIframe[con].tabs.windows
+            local new = {}
+            for k,v in ipairs(tabs) do
+                local wname = v:gsub("Tab","")
+                table.insert(new, {wname, text[con][wname]})
+            end
+            windows[con] = new
+        end
+    end
+    saveTbl.windows = windows
+    saveTbl.sides = GUIframe.sides
+    table.save(getMudletHomeDir() .. "/GUIframeSave.lua", saveTbl)
+end
+
+-- loads GUI setup from a previous save
+function GUIframe.loadSettings(redraw)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+    local saveTbl = {}
+    local path = getMudletHomeDir() .. "/GUIframeSave.lua"
+    path = path:gsub("\\","/")
+    mainW, mainH = getMainWindowSize()
+    if not io.exists(path) then debugc("GUIframe.loadSettings: save file doesn't exist.") return end
+    table.load(path, saveTbl)
+    resizeContainers("left", saveTbl.left.w, saveTbl.left.h)
+    resizeContainers("right", mainW - saveTbl.right.w, saveTbl.right.h)
+    resizeContainers("top", saveTbl.top.w, saveTbl.top.h)
+    resizeContainers("bottom", saveTbl.bottom.w, mainH - saveTbl.bottom.h)
+    for con, wins in pairs(saveTbl.windows) do
+        for _,name in ipairs(wins) do
+            if type(name) == "string" then
+                GUIframe.addWindow(GUIframe.windows[name], name, con)
+            else
+                local n, s = name[1], not name[2]
+                GUIframe.addWindow(GUIframe.windows[n], n, con, s)
+            end
+        end
+    end
+
+    for side, state in pairs(saveTbl.sides) do
+        if state == "enabled" then
+            GUIframe.enable(side)
+        elseif state == "disabled" then
+            GUiframe.disable(side,false)
+        elseif state == "hidden" then
+            GUIframe.disable(side,true)
+        end
+    end
+    -- force redraw of screen
+    if redraw then
+        setBackgroundColor(1,1,1)
+        setBackgroundColor(0,0,0)
+    end
+end
+
+-- can be called to force the script to run its config function again
+function GUIframe.reinitialize()
+    config()
+end
+
+-- can be called to activate a given tab without clicking on it
+function GUIframe.activate(name)
+    if not GUIframe.initialized then error("GUIframe not initialized",1) end
+	local window = GUIframe.windows[name]
+	if window then
+        local con, tabs = get_containers(window.container.name)
+        -- hide and unhighlight other windows and tabs
+        deselectContainer(con, tabs)
+        -- show selected window
+        window:show()
+        window.active = true
+        -- highlight selected tab
+        if window.showText then
+            GUIframe.tabs[name]:echo(configs.tabEchoStyle.."&lt;b&gt;"..name)
+        end
+    end
+end
+
+-- can be called to apply a style to a given tab
+function GUIframe.styleTab(name, style)
+    if not GUIframe.initialized then error("GUIframe not initialized",1) end
+	local tab = GUIframe.tabs[name]
+	if tab then
+	    tab:setStyleSheet(style)
+    end
+end
+
+-- internally used function to handle button click callbacks
+function GUIframe.buttonClick(name, event)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+	if table.contains(resizeLabels,name) then
+	    if event.button == "RightButton" then
+	        local lbl = GUIframe[name]
+	        lbl.difX, lbl.difY = event.x, event.y
+	        lbl.savedX, lbl.savedY = getMousePosition()
+            GUIframe[name].isClicked = true
+        end
+	elseif event.button == "LeftButton" then
+        local window = GUIframe.windows[name]
+        local con, tabs = get_containers(window.container.name)
+        -- hide and unhighlight other windows and tabs
+        deselectContainer(con, tabs)
+        -- show selected window
+        window:show()
+        window.active = true
+        -- highlight selected tab
+        if window.showText then
+            GUIframe.tabs[name]:echo(configs.tabEchoStyle.."&lt;b&gt;"..name)
+        end
+    elseif event.button == "RightButton" then
+        local window, tab = GUIframe.windows[name], GUIframe.tabs[name]
+        tab.savedX, tab.savedY = getMousePosition()
+        tab.difX, tab.difY, tab.isClicked = event.x, event.y, true
+        -- force update of coords for all tabs and tab containers
+        GUIframe.tabCoords = {}
+        for _, name in ipairs(tab_names) do
+            get_window_coords(GUIframe[name], true)
+            for tname, tab in pairs(GUIframe[name].windowList) do
+                get_window_coords(tab, true)
+            end
+        end
+    end
+    raiseEvent("GUIframe.buttonClick",name,event)
+end
+
+-- internally used function to handle button release callbacks
+function GUIframe.buttonRelease(name, event)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+	if table.contains(resizeLabels,name) then
+	    if event.button == "RightButton"  then
+            local lbl = GUIframe[name]
+            lbl.savedX, lbl.savedY, lbl.difX, lbl.difY, lbl.isClicked = nil, nil, nil, nil, false
+        end
+	elseif event.button == "RightButton" then
+	    local window, tab = GUIframe.windows[name], GUIframe.tabs[name]
+	    local con, tabs = get_containers(window.container.name)
+	    tab.difX, tab.difY, tab.savedX, tab.savedY, tab.isClicked = nil, nil, nil, nil, false
+	    hideWindow("show_container")
+	    for _, tname in ipairs(tab_names) do
+	        local info = GUIframe[tname]
+	        if info.mouse_over then
+	            local pos = info.space_pos
+	            info.mouse_over = nil
+	            GUIframe.addWindow(window, name, tname:gsub("Tabs",""), not window.showText)
+	            if pos then
+    	            reorderTabs(info, tab.name, pos)
+    	            adjustTabs(info)
+    	        end
+	        end
+	    end
+	    adjustTabs(tabs)
+	end
+	raiseEvent("GUIframe.buttonRelease",name,event)
+end
+
+-- internally used function to handle button move callbacks
+function GUIframe.buttonMove(name, event)
+    if not GUIframe.initialized then error("GUIframe not initialized",2) end
+	if table.contains(resizeLabels,name) then
+	    lbl = GUIframe[name]
+	    if lbl.isClicked then
+	        local w, h = getMousePosition()
+	        w, h = round(w - lbl.difX, 10), round(h - lbl.difY, 10)
+            mainW, mainH = getMainWindowSize()
+            local side, cW, cH, rX, rY
+            local minX = GUIframe.sides.left ~= "hidden" and GUIframe.topLeftContainer:get_width() or 0
+            local maxX = GUIframe.sides.right ~= "hidden" and GUIframe.topRightContainer:get_x() or mainW
+            local minY = GUIframe.sides.top ~= "hidden" and GUIframe.topContainer:get_height() or 0
+            local maxY = GUIframe.sides.left ~= "hidden" and GUIframe.bottomContainer:get_y() or mainH
+            local mid, min, max = GUIframe.topContainer:get_width(), math.min, math.max
+            local tabH, rH, rW = configs.tabHeight, configs.resizeHeight, configs.resizeWidth
+	        w, h = max(w, 0), max(h, 0)
+            local info = { -- specify position of resize labels and size of containers
+                resizeLeft = {side = "left", x = min(w, maxX - rW),
+                    y = min(max(h + rH / 2,tabH), mainH - tabH) - rH / 2,
+                    w = min(w, maxX - rW), h = min(max(h + rH / 2,tabH), mainH-tabH) },
+                resizeRight = {side = "right", x = min(max(w, minX), mainW),
+                    y = min(max(h + rH / 2, tabH), mainH - tabH) - rH / 2,
+                    w = min(max(w, minX), mainW - rW) + rW, h = min(max(h + rH / 2, tabH), mainH - tabH) },
+                resizeTop = {side = "top", x = minX + (mid - rW) / 2,
+                    y = min(h, maxY - rH), w = maxX - minX, h = min(h, maxY - rH) },
+                resizeBottom = {side = "bottom", x = minX + (mid - rW) / 2,
+                    y = min(max(h, minY) - rH, mainH), w = maxX - minX, h = min(max(h, minY) + rH, mainH)} }
+            info = info[name]
+            lbl:move(info.x, info.y)
+            resizeContainers(info.side, info.w, info.h)
+        end
+    else
+        local window, tab = GUIframe.windows[name], GUIframe.tabs[name]
+        local con, tabs = get_containers(window.container.name)
+        local x, y = getMousePosition()
+        local over_con, over_tab
+        if tab and tab.isClicked then
+            moveWindow(tab.name, x - tab.difX, y - tab.difY)
+            -- check to see if mouse is over any tab containers
+            for _, tcon in ipairs(tab_names) do
+                if check_overlap(tcon, x, y) then
+                    over_con = tcon
+                    GUIframe[tcon].mouse_over = true
+                    local info = GUIframe.tabCoords[tcon]
+                    local tx, ty, tw, th = info.x, info.y, info.w, info.h
+                    createLabel("show_container", 0, 0, 0, 0, 1)
+                    moveWindow("show_container", tx, ty)
+                    resizeWindow("show_container", tw, th)
+                    setLabelStyleSheet("show_container",[[
+                        background-color: black;
+                        border: 2px solid white;]])
+                    showWindow("show_container")
+                    lowerWindow("show_container")
+                    -- check to see if mouse is over any tabs
+                    for tname, info in pairs(GUIframe.tabs) do
+                        if tname ~= name and check_overlap(info, x, y) then
+                            over_tab = info.name
+                            local windows = GUIframe[tcon].windows
+                            local index = table.index_of(windows,over_tab)
+                            makeSpace(GUIframe[tcon],tab,index)
+                            break
+                        end
+                    end
+                    break
+                end
+            end
+            -- remove any unnecessary spaces in tab containers
+            for _, name in ipairs(tab_names) do
+                if name ~= over_con then
+                    adjustTabs(GUIframe[name])
+                    GUIframe[name].mouse_over = nil
+                end
+            end
+        end
+	end
+	raiseEvent("GUIframe.buttonMove",name,event)
+end
+
+-- internally used function to handle sysWindowResizeEvent
+function GUIframe.eventHandler(event,...)
+    if event == "sysWindowResizeEvent" and GUIframe.initialized then
+        refresh()
+    end
+end
+
+registerAnonymousEventHandler("sysWindowResizeEvent","GUIframe.eventHandler")</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>GUIframe Top/Bottom Containers</name>
+								<packageName></packageName>
+								<script>  --GUIframe or not
+	lab = lab or {}
+	lab.GUIframeBottom = Geyser.Container:new({'GUIframeBottomContainer', x=0,y=0,width='100%', height='100%'})
+  GUIframe.addWindow(lab.GUIframeBottom,"Bottom Container","bottom")
+  
+ 
+-- registerAnonymousEventHandler('sysLoadEvent', 'GUIframe.loadSettings')
+ 
+ 
+ 
+ 
+ 
+
+
+   -- tabStyle = 
+	 --[[
+        background-color: rgba(150,150,150,100);
+        border-width: 2px;
+        border-style: outset;
+        border-color: rgba(50,50,50,200);
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        margin-right: 1px;
+        margin-left: 1px;
+        qproperty-alignment: 'AlignCenter | AlignCenter';]]--,</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>String Format - Python notation</name>
+							<packageName></packageName>
+							<script>getmetatable("").__mod = function(a, b)
+        if not b then
+                return a
+        elseif type(b) == "table" then
+                return string.format(a, unpack(b))
+        else
+                return string.format(a, b)
+        end
+end
+--local cond = 'works.'
+-- `print('Hey, this actually %s for multiple placeholders' % {'heyhey','cond'})</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Generic Class Constructor + table implementation</name>
+							<packageName></packageName>
+							<script>
+function Class(members)
+  members = members or {}
+  local mt = {
+    __metatable = members;
+    __index     = members;
+  }
+  local function new(_, init)
+    return setmetatable(init or {}, mt)
+  end
+  local function copy(obj, ...)
+    local newobj = obj:new(unpack(arg))
+    for n,v in pairs(obj) do newobj[n] = v end
+    return newobj
+  end
+  members.new  = members.new  or new
+  members.copy = members.copy or copy
+  return mt
+end
+
+
+Class(table)
+
+--[[
+x = table:new{b=2, c=3} 
+print(tostring( x:contains('c') )) 
+--]]
+</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>CSSman</name>
+							<packageName></packageName>
+							<script>-- CSSMan by Vadi. Public domain.
+
+CSSMan = {}
+CSSMan.__index = CSSMan
+
+function CSSMan.new(stylesheet)
+  local obj  = { stylesheet = {} }
+  setmetatable(obj,CSSMan)
+  local trim = string.trim
+
+  assert(type(stylesheet) == "string", "CSSMan.new: no stylesheet provided. A possible error is that you might have used CSSMan.new, not CSSMan:new")
+
+  for line in stylesheet:gmatch("[^\r\n]+") do
+    local attribute, value = line:match("^(.-):(.-);$")
+    if attribute and value then
+      attribute, value = trim(attribute), trim(value)
+      obj.stylesheet[attribute] = value
+    end
+  end
+
+  return obj
+end
+
+function CSSMan:set(key, value)
+  self.stylesheet[key] = value
+end
+
+function CSSMan:get(key)
+  return self.stylesheet[key]
+end
+
+function CSSMan:getCSS(key)
+  local lines, concat = {}, table.concat
+  for k,v in pairs(self.stylesheet) do lines[#lines+1] = concat({k,": ", v, ";"}) end
+  return concat(lines, "\n")
+end
+
+function CSSMan:gettable()
+  return self.stylesheet
+end
+
+function CSSMan:settable(tbl)
+  assert(type(tbl) == "table", "CSSMan:settable: table expected, got "..type(tbl))
+
+  self.stylesheet = tbl
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>calculate filler</name>
+							<packageName></packageName>
+							<script>lab = lab or {}
+	
+	lab.calcFiller = function(str,length,fillchar)
+		local filler = ''
+		local fillchar = fillchar or ' '  --default to space
+		local slen = str:len()
+		
+		if slen &lt; length then
+			for i=1, length-slen do
+				filler = filler .. fillchar
+			end
+		elseif slen == length then
+			filler = ''
+		else
+			
+			error('string too large for fillspace: ' .. length .. '\n' .. str)			
+		end
+		
+		return filler
+	end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>ColorLinks - by JorMox</name>
+							<packageName></packageName>
+							<script>-- colorLinks function provides an easy way to intersperse links into colored text
+-- Link tag format: &lt;link: code here ; hint here ; color&gt;text of link&lt;/link&gt;
+
+function colorLinks(win, str)
+	if not str then
+		str, win = win, "main"
+	end
+	str = str:split("&lt;/link&gt;")
+	for _, w in ipairs(str) do
+		local before, info, link = w:match("(.*)&lt;link: ([^&gt;]+)&gt;(.*)")
+		if before then
+			cecho(win, before)
+			info = info:split(" ; ")
+			if info[3] then
+				if color_table[info[3]] then
+					link = string.format("&lt;%s&gt;%s&lt;reset&gt;", info[3], link)
+				else
+					info[3] = nil
+				end
+			end
+			cechoLink(win, link, info[1], info[2] or "", info[3] and true)
+		else
+			cecho(win, w)
+		end
+	end
+end
+
+
+
+--colorLinks("\nStart of line &lt;link: echo('link clicked') ; click here ; green'&gt; This can be clicked.&lt;/link&gt; and some more non-link text.")
+
+
+</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Grid object class</name>
+							<packageName></packageName>
+							<script>--label grid
+grid = {}
+grid.__index = grid
+
+function grid:new( lname, rows, columns, cont, css)
+  local self = {}
+  setmetatable(self, grid)
+
+  -- calculate some values for geyser labels
+  local w = 100/columns
+  local h = 100/rows
+  local topercent = function(n) return tostring(n) .. '%' end
+
+  --lets create the labels
+  for r=1,rows do
+    for c=1,columns do
+      self[lname .. r .. 'x' .. c] = Geyser.Label:new({
+        name=string.format('%s_%sx%s', lname, r, c), 
+        x = topercent((w*c)-w), y = topercent((h*r)-h), 
+        width = topercent(w), height = topercent(h)
+        }, cont)
+      self[lname .. r .. 'x' .. c]:setStyleSheet(css:getCSS())
+    end
+  end
+
+  -- the object is created, lets return it
+  return self
+end
+
+--testcontainer = Geyser.Container:new({'testcontainer'})
+--GUIframe.addWindow(testcontainer, 'TestGrid', 'topleft')
+--testgrid = grid:new('tgrid', 4, 5, testcontainer, lab.BoxCSS)</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>makeClickyDraggy</name>
+							<packageName></packageName>
+							<script>--[[
+local mt = getmetatable(eq)
+function mt:newfunc() return 'newfunc says I work, but the notation is icky' end
+setmetatable(eq, mt )
+]]--
+
+
+function makeClickyDraggy(obj) --object is a geyser container or ordinary label. Not a console or HBox etc
+	local mt = getmetatable(obj)
+	mt.MIN_HEIGHT = 100
+	mt.MIN_WIDTH = 100
+	
+	-- add a resizer square to the geyser object
+	obj['resizer'] = Geyser.Label:new({
+  name = obj.name .. "_resizer",  x = '-15px', y = "-15px", width = 15, height = 15,
+  fgColor = "black", color = "white",
+	}, obj)
+	obj.resizer:setStyleSheet([[border-radius: 2; background-color: white;]])
+	
+	-- add a mover square to the geyser object
+	obj['mover'] = Geyser.Label:new({
+  name = obj.name .. "_mover",  x = 0, y = 0, width = 15, height = 15,
+  fgColor = "black", color = "white",
+	}, obj)
+	obj.mover:setStyleSheet([[border-radius: 2; background-color: white;]])
+	setLabelClickCallback("mover", "onMoverClick")
+	setLabelReleaseCallback("mover", "onMoverRelease")
+	
+	-- lets build the metamethods to add to the object
+	function mt:showClickPoints()
+		self['resizer']:show()
+		self['mover']:show()
+	end
+	function mt:hideClickPoints()
+		self['resizer']:hide()
+		self['mover']:hide()
+	end
+	
+	
+	
+	
+	
+	
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Animated Timers</name>
+							<packageName></packageName>
+							<script>demonnic = demonnic or {}
+demonnic.anitimer = demonnic.anitimer or {}
+demonnic.anitimer.timers = demonnic.anitimer.timers or {}
+demonnic.anitimer.activeTimers = demonnic.anitimer.activeTimers or {}
+
+function demonnic.anitimer:new(name, cons, time, options)
+  if options and type(options) ~= "table" then
+    error("demonnic.anitimer:new() -- if you provide a fourth parameter, it must be a table. Please see http://github.com/demonnic/animatedtimers for detailed usage information")
+  end
+  if not options then
+    options = {}
+  end
+  if options.showTime == nil then options.showTime = true end 
+  options.timerCaption = options.timerCaption or ""
+
+  if not demonnic.anitimer.timers[name] then
+    demonnic.anitimer.timers[name] = {}
+    demonnic.anitimer.timers[name].gauge = Geyser.Gauge:new(cons, options.container)
+    demonnic.anitimer.timers[name].watch = createStopWatch()
+  else
+    for k,v in pairs(cons) do
+      demonnic.anitimer.timers[name].gauge[k] = v
+    end
+    if options.container then
+      options.container:add(demonnic.anitimer.timers[name].gauge)
+    else
+      Geyser:add(demonnic.anitimer.timers[name].gauge)
+    end
+  end
+    demonnic.anitimer.timers[name].max = time
+    demonnic.anitimer.timers[name].current = time
+    demonnic.anitimer.timers[name].showTime = options.showTime
+    demonnic.anitimer.timers[name].timerCaption = options.timerCaption
+		demonnic.anitimer.timers[name].hook = options.hook
+    if options.cssFront then
+      if not options.cssBack then
+        options.cssBack = options.cssFront .. "background-color: black;"
+      end
+      demonnic.anitimer.timers[name].gauge:setStyleSheet(options.cssFront, options.cssBack)
+    end
+    if not table.contains(demonnic.anitimer.activeTimers, name) then table.insert(demonnic.anitimer.activeTimers, name) end
+    resetStopWatch(demonnic.anitimer.timers[name].watch)
+    startStopWatch(demonnic.anitimer.timers[name].watch)
+    demonnic.anitimer:update(name)
+end
+
+function demonnic.anitimer:getTime(name)
+  if not demonnic.anitimer.timers[name] then return 0 end
+  local max = demonnic.anitimer.timers[name].max
+  local current = getStopWatchTime(demonnic.anitimer.timers[name].watch)
+  local newValue = max - current
+  return newValue
+end
+
+function demonnic.anitimer:showTimers()
+  demonnic:echo("&lt;yellow&gt;List of animated timers which have been created")
+  for timer,_ in pairs(demonnic.anitimer.timers) do
+    demonnic:echo(string.format("   %s", timer))
+  end
+  local actives = ""
+  for _,timer in ipairs(demonnic.anitimer.activeTimers) do
+    if actives == "" then
+      actives = timer
+    else
+      actives = string.format("%s, %s", actives, timer)
+    end
+  end
+  demonnic:echo("&lt;yellow&gt;Active timers: &lt;red&gt;" .. actives)
+end
+
+function demonnic.anitimer:update(name)
+  if not demonnic.anitimer.timers[name] then return nil end
+  demonnic.anitimer.timers[name].current = demonnic.anitimer:getTime(name)
+  local time = demonnic.anitimer.timers[name].current
+  demonnic.anitimer.timers[name].text = (demonnic.anitimer.timers[name].showTime and string.format("%.1f %s", time, demonnic.anitimer.timers[name].timerCaption or "")) or (demonnic.anitimer.timers[name].timerCaption or "")
+  demonnic.anitimer.timers[name].gauge:setValue(demonnic.anitimer.timers[name].current, demonnic.anitimer.timers[name].max, demonnic.anitimer.timers[name].text)
+end
+
+function demonnic.anitimer:stop(name)
+  if not demonnic.anitimer.timers[name] then return nil end
+  stopStopWatch(demonnic.anitimer.timers[name].watch)
+  demonnic.anitimer.timers[name].gauge:hide()
+  for i,v in pairs(demonnic.anitimer.activeTimers) do
+    if demonnic.anitimer.timers[v] == demonnic.anitimer.timers[name] then
+      table.remove(demonnic.anitimer.activeTimers, i)
+      return
+    end
+  end
+end
+
+function demonnic.anitimer:stopAll()
+  for _,name in pairs(demonnic.anitimer.activeTimers) do
+    demonnic.anitimer:stop(name)
+  end
+end
+
+function demonnic.anitimer:pause(name)
+  if not demonnic.anitimer.timers[name] then return nil end
+  stopStopWatch(demonnic.anitimer.timers[name].watch)
+  for i,v in pairs(demonnic.anitimer.activeTimers) do
+    if v == name then
+      table.remove(demonnic.anitimer.activeTimers, i)
+      return
+    end
+  end
+end
+
+function demonnic.anitimer:pauseAll()
+  for name,_ in pairs(demonnic.anitimer.timers) do
+    demonnic.anitimer:pause(name)
+  end
+end
+
+function demonnic.anitimer:destroy(name)
+  if not demonnic.anitimer.timers[name] then return nil end
+  demonnic.anitimer:stop(name)
+  demonnic.anitimer.timers[name] = nil
+  return true
+end
+
+function demonnic.anitimer:destroyAll()
+  for name,_ in pairs(demonnic.anitimer.timers) do
+    demonnic.anitimer:destroy(name)
+  end
+end
+
+function demonnic.anitimer:start(name)
+  if not demonnic.anitimer.timers[name] then return nil end
+  local current = demonnic.anitimer.timers[name].current
+  if current == 0 then return nil end
+  demonnic.anitimer.timers[name].max = current
+  resetStopWatch(demonnic.anitimer.timers[name].watch)
+  startStopWatch(demonnic.anitimer.timers[name].watch)
+  if not table.contains(demonnic.anitimer.activeTimers, name) then table.insert(demonnic.anitimer.activeTimers, name) end
+  demonnic.anitimer.timers[name].gauge:show()
+  demonnic.anitimer:update(name)
+end
+
+function demonnic.anitimer:startAll()
+  for name,_ in pairs(demonnic.anitimer.timers) do
+    if not table.contains(demonnic.anitimer.activeTimers, name) then
+      demonnic.anitimer:start(name)
+    end
+  end
+end
+
+function demonnic.anitimer:animate()
+  for i,v in pairs(demonnic.anitimer.activeTimers) do
+    name = v
+    demonnic.anitimer:update(name)
+    if demonnic.anitimer:getTime(name) &lt;= 0 then
+      demonnic.anitimer.timers[name].gauge:hide()
+      table.remove(demonnic.anitimer.activeTimers, i)
+      stopStopWatch(demonnic.anitimer.timers[name].watch)
+      demonnic.anitimer.timers[name].max = 0
+      demonnic.anitimer.timers[name].current = 0
+			demonnic.anitimer:executeHook(name)
+    end
+  end
+end
+
+function demonnic.anitimer:executeHook(name)
+  local hook = demonnic.anitimer.timers[name].hook
+	local r = ""
+	if hook == nil then
+	  return
+	elseif type(hook) == "string" then
+	  local f,e = loadstring("return " .. hook)
+		if not f then
+		  f,e = assert(loadstring(hook))
+		end
+		f()
+	elseif type(hook) == "function" then
+	  hook()
+	else
+	  error("AnimatedTimers: you've provided a hook for " .. name .. " which is neither a string nor a function. Unable to execute")
+	end
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>GUILabel</name>
+							<packageName></packageName>
+							<script>
+GUIlabel = GUIlabel or {}
+local adjustInfo
+
+GUIlabel.adjustLabel = function(name, x, y, w, h, c)
+    local info, lbl
+    if type(name) == "table" then
+        if name.type == "label" then
+            lbl = name
+        else
+            info = name
+        end
+    else
+        info = {name = name, x = x, y = y, width = w, height = h, color = c}
+    end
+    if not lbl then
+        lbl = Geyser.Label:new(info)
+    end
+    lbl:setClickCallback("GUIlabel.onClick",lbl)
+    lbl:setReleaseCallback("GUIlabel.onRelease",lbl)
+    lbl:setMoveCallback("GUIlabel.onMove",lbl)
+    if info then
+        return lbl
+    end
+end
+
+local function make_percent(num)
+    num = math.floor(10000*num)/100
+    num = tostring(num).."%"
+    return num
+end
+
+GUIlabel.finishLabel = function(lbl, size_as_percent, position_as_percent)
+    lbl:setClickCallback("fakeFunction")
+    lbl:setReleaseCallback("fakeFunction")
+    lbl:setMoveCallback("fakeFunction")
+    local x, y, w, h = lbl:get_x(), lbl:get_y(), lbl:get_width(), lbl:get_height()
+    local winw, winh = getMainWindowSize()
+    x, y, w, h = make_percent(x/winw), make_percent(y/winh), make_percent(w/winw), make_percent(h/winh)
+    if size_as_percent then lbl:resize(w,h) end
+    if position_as_percent then lbl:move(x,y) end
+end
+
+GUIlabel.onClick = function(lbl, event)
+    if event.button == "LeftButton" then
+        local x, y = getMousePosition()
+        local w, h = lbl:get_width(), lbl:get_height()
+        local x1, y1 = x - event.x, y - event.y
+        local x2, y2 = x1 + w, y1 + h
+        local left, right, top, bottom = event.x &lt;= 10, x &gt;= x2 - 10, event.y &lt;= 10, y &gt;= y2 - 10
+        if right and left then left = false end
+        if top and bottom then top = false end
+        local move = not (right or left or top or bottom)
+        adjustInfo = {name = lbl.name, top = top, bottom = bottom, left = left, right = right, move = move, x = x, y = y}
+    end
+end
+
+GUIlabel.onRelease = function(lbl, event)
+    if event.button == "LeftButton"  and adjustInfo and adjustInfo.name == lbl.name then
+        adjustInfo = nil
+    end
+end
+
+GUIlabel.onMove = function(lbl, event)
+    if adjustInfo and adjustInfo.name == lbl.name then
+        local x, y = getMousePosition()
+        local winw, winh = getMainWindowSize()
+        local x1, y1, w, h = lbl.get_x(), lbl.get_y(), lbl:get_width(), lbl:get_height()
+        local dx, dy = adjustInfo.x - x, adjustInfo.y - y
+        local max, min = math.max, math.min
+        if adjustInfo.move then
+            local tx, ty = max(0,x1-dx), max(0,y1-dy)
+            tx, ty = min(tx, winw - w), min(ty, winh - h)
+            lbl:move(tx, ty)
+        else
+            local w2, h2, x2, y2 = w - dx, h - dy, x1 - dx, y1 - dy
+            local tx, ty, tw, th = x1, y1, w, h
+            if adjustInfo.top then
+                ty, th = y2, h + dy
+            elseif adjustInfo.bottom then
+                th = h2
+            end
+            if adjustInfo.left then
+                tx, tw = x2, w + dx
+            elseif adjustInfo.right then
+                tw = w2
+            end
+            tx, ty, tw, th = max(0,tx), max(0,ty), max(10,tw), max(10,th)
+            tw, th = min(tw, winw), min(th, winh)
+            tx, ty = min(tx, winw-tw), min(ty, winh-th)
+            lbl:move(tx, ty)
+            lbl:resize(tw, th)
+        end
+        adjustInfo.x, adjustInfo.y = x, y
+    end
+end
+</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>CSS</name>
+							<packageName></packageName>
+							<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>Gauge CSS</name>
+								<packageName></packageName>
+								<script>lab.GaugeBackCSS = CSSMan.new([[
+  background-color: rgba(0,0,0,0);
+  border-style: solid;
+  border-color: DimGrey;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 5px;
+	qproperty-alignment: 'AlignCenter | AlignTop';
+]])
+
+lab.GaugeFrontCSS = CSSMan.new([[
+  background-color: rgba(0,0,0,0);
+  border-style: solid;
+  border-color: DimGrey;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 5px;
+	qproperty-alignment: 'AlignCenter | AlignBottom';
+]])</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Background CSS</name>
+								<packageName></packageName>
+								<script>lab.BackgroundCSS = CSSMan.new([[
+  background-color: rgb(20,0,20);
+]])
+
+lab.TempBackgroundCSS = CSSMan.new([[
+  background-color: rgb(120,0,120);
+]])</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Icon CSS</name>
+								<packageName></packageName>
+								<script>lab.IconCSS = CSSMan.new([[
+	background-color: rgba(0,0,0,0);
+	foreground-color: rgb(200,100,100);
+	border-style: solid;
+	border-color: DimGrey;
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 5px;
+]])</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Box CSS</name>
+								<packageName></packageName>
+								<script>lab.BoxCSS = CSSMan.new([[
+  background-color: rgba(0,0,0,100);
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: DimGrey;
+  margin: 1px;
+]])
+
+lab.BoxNBCSS = CSSMan.new([[
+  background-color: rgba(0,0,0,0);
+]])</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Tab CSS</name>
+								<packageName></packageName>
+								<script>lab.TabCSS = CSSMan.new([[
+  background-color: rgba(0,0,0,100);
+  border-style: solid;
+  border-width: 2px;
+  border-color: DimGrey;
+  border-radius: 2px;
+  margin: 1px;
+  qproperty-wordWrap: true;
+]])
+
+lab.SelectedTabCSS = CSSMan.new([[
+  background-color: rgba(50,50,50,100);
+  border-style: solid;
+  border-width: 2px;
+  border-color: sienna;
+  border-radius: 2px;
+  margin: 1px;
+  qproperty-wordWrap: true;
+]])</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Title CSS</name>
+								<packageName></packageName>
+								<script>lab.TitleCSS = CSSMan.new([[
+  background-color: rgba(0,0,0,0);
+  border-style: solid;
+  border-color: DimGrey;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 3px;
+	qproperty-alignment: 'AlignLeft';
+]])
+
+</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Prop CSS</name>
+								<packageName></packageName>
+								<script>lab.PropCSSblank = CSSMan.new([[
+  background-color: rgba(50,50,50,50);
+  border-style: solid;
+  border-color: DimGrey;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 3px;
+	qproperty-alignment: 'AlignCenter';
+]])
+
+
+lab.PropCSSgood = CSSMan.new([[
+  background-color: rgba(50,50,50,50);
+  border-style: solid;
+  border-color: SeaGreen;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 3px;
+	qproperty-alignment: 'AlignCenter';
+]])
+
+
+lab.PropCSSburnable = CSSMan.new([[
+  background-color: rgba(50,50,50,50);
+  border-style: solid;
+  border-color: SaddleBrown;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 3px;
+	qproperty-alignment: 'AlignCenter';
+]])
+
+lab.PropCSSonfire = CSSMan.new([[
+  background-color: rgba(50,50,50,50);
+  border-style: solid;
+  border-color: OrangeRed;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 3px;
+	qproperty-alignment: 'AlignCenter';
+]])
+
+lab.PropCSSexplodable = CSSMan.new([[
+  background-color: rgba(50,50,50,50);
+  border-style: solid;
+  border-color: firebrick;
+  border-width: 2px;
+  border-radius: 2px;
+  margin: 3px;
+	qproperty-alignment: 'AlignCenter';
+]])</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Text Field CSS</name>
+								<packageName></packageName>
+								<script>lab.TextFieldCSS = CSSMan.new([[
+  background-color: rgba(0,0,0,100);
+  border-style: solid;
+  border-width: 2px;
+  border-color: DimGrey;
+  border-radius: 2px;
+  margin: 1px;
+  qproperty-wordWrap: true;
+]])
+
+lab.SelectedTextFieldCSS = CSSMan.new([[
+  background-color: rgba(50,50,50,100);
+  border-style: solid;
+  border-width: 2px;
+  border-color: sienna;
+  border-radius: 2px;
+  margin: 1px;
+  qproperty-wordWrap: true;
+]])</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Table functions</name>
+							<packageName></packageName>
+							<script>--remove all instances of value V from indexed table T
+function table.removeall(t,v)
+	for i,val in ipairs(t) do
+		if v == val then
+			table.remove(t,i)
+		end
+	end
+end
+
+function table.remove_val(t,val)
+	table.remove(t, table.index_of(t, val) )
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Grid dimensions</name>
+							<packageName></packageName>
+							<script>function calc_grid(rows, columns)
+
+  local w = 100/columns
+  local h = 100/rows
+  local topercent = function(n) return tostring(n) .. '%' end
+	local grid = {}
+	
+  --lets calculate the label dimensions
+  for r=1,rows do
+    for c=1,columns do
+			local dimensions = {}
+			dimensions.r = tostring(r)
+			dimensions.c = tostring(c)
+			dimensions.x = topercent((w*c)-w)
+			dimensions.y = topercent((h*r)-h)
+			dimensions.width = topercent(w)
+			dimensions.height = topercent(h)
+			dimensions.w = topercent(w)
+			dimensions.h = topercent(h)
+			
+			table.insert(grid, dimensions)
+    end
+  end
+
+  return grid
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>String Library Additions</name>
+							<packageName></packageName>
+							<script>function string.rightAlign(text, num)
+    local width = tonumber(num) or 80
+    return(string.rep(" ", (width - #text)) .. text)
+end
+
+local temp = "the current line length is:"
+
+echo('\n')
+echo(temp)
+echo(getCurrentLine():len())
+
+local righttest = 'right aligned after text on CURRENT line.'
+echo(righttest:rightAlign(100-getCurrentLine():len()))</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Get Class</name>
+							<packageName></packageName>
+							<script>function getclass()
+	local class = gmcp.Char.Status.class
+	return class:gsub('%.',''):lower()
+end
+
+function getlevel()
+
+	return tonumber( string.match(gmcp.Char.Status.level, '^(%d+)') )
+
+end
+
+function getname()
+
+ return gmcp.Char.Status.first_name:lower()
+
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>String Library Addons</name>
+							<packageName></packageName>
+							<script>function string:fillto(maxw, fillchar)
+  local slen = string.len(self)
+  local filler = ''
+  local fillchar = fillchar or ' '
+  if slen &lt; maxw then
+    filler = string.rep(fillchar, maxw - slen)
+  end
+  return filler
+end
+
+function string:calcfiller(maxw, fillchar)
+  local slen = string.len(self)
+  local filler = ''
+  local fillchar = fillchar or ' '
+  if slen &lt; maxw then
+    filler = string.rep(fillchar, maxw - slen)
+  end
+  return filler
+end
+
+function string:padleft(swidth, padchar)
+  local padchar = padchar or ' '
+  local str = self
+  local slen = str:len()
+  if slen &lt; swidth then
+    str = string.rep(padchar, swidth - slen) .. str
+  elseif slen &gt; swidth then
+    str = str:cut(swidth)
+  end
+  return str
+end
+
+function string:padright(swidth, padchar)
+  local padchar = padchar or ' '
+  local str = self
+  local slen = str:len()
+  if slen &lt; swidth then
+    str = str .. string.rep(padchar, swidth - slen)
+  elseif slen &gt; swidth then
+    str = str:cut(swidth)
+  end
+  return str
+end
+
+function string:csqbr(cols, padtype, padto, padchar)
+  local s = self
+  local padtype = padtype or 'no padding necessary'
+  local padchar = padchar or ' '
+  -- default space as pad type
+  if padtype == 'left' then
+    s = s:padleft(padto, '-')
+  elseif padtype == 'right' then
+    s = s:padright(padto, padchar)
+  end
+  return string.format("&lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;]", cols.br, cols.d, s, cols.br)
+end
+
+function string.align(str, how, width, char)
+	local char = char or ' '
+  if (not str) then
+    error("No string was passed")
+  end
+  local str = tostring(str);
+  local amt = tonumber(width) or 80;
+  local space = amt - #(str);
+  if (how == "left") then
+    return str .. string.rep(char, space)
+  elseif (how == "right") then
+    return string.rep(char, space) .. str
+  elseif (how == "center") then
+    -- math.round is not a native lua math option, and isn't included in mudlet by default (tested)
+    return string.rep(char, (amt / 2) - math.floor(#(str) / 2)) .. str .. string.rep(char, (amt / 2) - math.floor(#(str) / 2))
+  else
+    error("Need to be given left, right or center alignment")
+  end
+end</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>cLinkify</name>
+								<packageName></packageName>
+								<script>function cLinkify(str, tooltip, funcstring, funcargs)
+	local funcstring = funcstring %funcargs
+	cechoLink(str, funcstring, tooltip, true)
+end
+
+</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>abtn</name>
+							<packageName></packageName>
+							<script>abtn = abtn or {}
+abtn.__index = abtn
+abtn.mesets = abtn.mesets or {}
+
+
+
+
+
+
+
+
+
+
+
+function abtn.click_sorter(btn)
+	--print('----------------')
+	--print(btn .. ' clicked')
+	--_G[btn]['onclickfunc']()
+	local s = [[_G.%s.onclickfunc()]] %{btn}
+	--print(s)
+	loadstring(s)()
+end
+
+
+
+function abtn.varchecker(var)
+	
+end
+</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:new()</name>
+								<packageName></packageName>
+								<script>function abtn:new(params, container)
+  local self = {}
+  local container = container or Geyser
+  setmetatable(self, abtn)
+
+  -- first declare all parameters ---------------------
+  self.name = params.name
+  self.x = params.x
+  self.y = params.y
+  self.width = params.width
+  self.height = params.height
+  self.state = 1
+  self.event = params.event or params.name .. '_clicked'
+  self.check = params.check or false
+	self.timeout = params.timeout or 1
+  self.listento = params.listento or false
+  self.multistate = params.multistate or false
+  self.imgs = params.imgs or false
+  self.cssman = table.deepcopy(params.cssman) or false
+  self.aliases = params.aliases or false
+  self.funcs = params.funcs or false
+  self.css = params.css or false
+  self.msgs = params.msgs or false
+  self.imgs = params.imgs or false
+	self.id = params.id or false
+	self.cd = params.cd or false
+	self.cdtimeout = params.cdtimeout or false
+	self.cdlockout  = params.cdlockout or true 
+  
+  -- now we create stuff ------------------------------
+
+  -- this internal func needs to exist as a workaround because of mudlet
+	-- setClickCallback taking only string representations of functions.
+  self.onclickfunc = function()
+    if self.multistate then
+      self:run_multistate()
+    else
+      self:toggle()
+    end
+  end
+  
+  -- create the label itself
+  self[self.name .. '_label'] = Geyser.Label:new({
+      name = self.name .. '_mainlabel',
+      x = self.x or nil, y = self.y or nil,
+      width = self.width or nil, height = self.height or nil, 
+    }, container) --if x,y,width,height not defined, container must be hbox/vbox
+
+  -- set the setClickCallback (future: other types of clicks and click-hold-down lengths?)
+  self[self.name .. '_label']:setClickCallback('abtn.click_sorter', self.name, true)
+
+  -- register the event handler (this event will cause button visuals to update)
+  if self.listento then 
+    self.eventhandler = registerAnonymousEventHandler(self.listento,  function() self:sync() end ) 
+  end
+	
+	-- create the cd
+	if self.cd then
+		self.cdobj = balsys:create( self.name .. '_cd', true, true, 0.75)
+	end
+
+  -- and now we sync it with actual values
+  self:initial_sync()
+
+  return self
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:helpers</name>
+								<packageName></packageName>
+								<script>function abtn:getstate()
+	return self.state
+end
+
+function abtn:hide()
+	self[self.name .. '_label']:hide()
+end
+
+function abtn:show()
+	self[self.name .. '_label']:show()
+end
+
+function abtn:echo(msg)
+	self[self.name .. '_label']:echo(msg)
+end
+
+function abtn:setStyleSheet(stylesheet)
+	self[self.name .. '_label']:setStyleSheet(stylesheet)
+end
+
+function abtn:flash(duration)
+	self[self.name .. '_label']:flash(duration or 4)
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:cdowns</name>
+								<packageName></packageName>
+								<script>function abtn:spend(time)
+	if not self.cd then return false end
+	local time = time or self.cd
+	self[self.name .. '_cd']:spend(time)
+end
+</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:setmsg()</name>
+								<packageName></packageName>
+								<script>function abtn:setmsg(msg, state)
+  local state = state or false
+  if state then
+    self.msgs[tonumber(state)] = msg
+    self[self.name .. '_label']:echo(self.msgs[tonumber(self.state)])
+  else
+    for state, msgs in ipairs(self.msgs) do
+      self.msgs[state] = msg
+      self[self.name .. '_label']:echo(self.msgs[tonumber(self.state)])
+    end
+  end
+end
+
+function abtn:setFontSize(size)
+  self[self.name .. '_label']:setFontSize(size)
+end
+
+function abtn:setFont(font)
+  self[self.name .. '_label']:setFont(font)
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:toggle()</name>
+								<packageName></packageName>
+								<script>function abtn:toggle()
+  if self.state == 1 then
+    self:on()
+  else
+    self:off()
+  end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:off()</name>
+								<packageName></packageName>
+								<script>function abtn:off(nocmd)
+  local nocmd = nocmd or false
+  if self.state == 1 then return end  
+  self.state = 1
+  -- first, run commands if needed
+  if not nocmd then
+    if self.aliases then
+      if self.aliases[2] then 
+        expandAlias(self.aliases[2]) 
+      end
+    end
+
+    if self.funcs then
+      if self.funcs[2] then 
+        self.funcs[2]() 
+      end
+    end
+  end
+
+  if self.msgs then
+    if self.msgs[1] then
+      self:echo(self.msgs[1])
+    end
+  end
+  
+  if self.cssman then
+    self:apply_cssman()
+  elseif self.css then
+    self[self.name .. '_label']:setStyleSheet(self.css[tonumber(self.state)])
+  end
+  
+  
+  if not nocmd then raiseEvent(self.event, '1') end
+
+  if self.timeout then
+    if self.timer then killTimer(self.timer) end
+    self.timer = tempTimer(self.timeout, function() self:sync() end)
+  end
+  
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:on()</name>
+								<packageName></packageName>
+								<script>
+function abtn:on(nocmd)
+  local nocmd = nocmd or false
+  if self.state == 2 then return end
+  self.state = 2
+
+  if not nocmd then
+    if self.aliases then
+      if self.aliases[1] then 
+        expandAlias(self.aliases[1]) 
+      end
+    end
+  
+    if self.funcs then
+      if self.funcs[1] then
+        self.funcs[1]() 
+      end
+    end
+  end
+
+  if self.msgs then
+    if self.msgs[2] then
+      self:echo(self.msgs[2])
+    end
+  end
+  
+  if self.cssman then
+    self:apply_cssman()
+  else
+    self[self.name .. '_label']:setStyleSheet(self.css[2])
+  end
+  
+  
+  if not nocmd then raiseEvent(self.event, '2') end
+  if self.timeout then
+    if self.timer then killTimer(self.timer) end
+    self.timer = tempTimer(self.timeout, function() self:sync() end)
+  end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:set_multistate()</name>
+								<packageName></packageName>
+								<script>
+
+function abtn:set_multistate(state)
+
+	self.state = state
+	
+	if self.msgs then 
+		if self.msgs[state] then
+			self:echo(self.msgs[tonumber(self.state)])
+		end
+	end
+	
+	if self.cssman then
+		self:apply_cssman()
+	else
+		self[self.name .. '_label']:setStyleSheet(self.css[tonumber(self.state)])
+	end
+	
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:run_multistate()</name>
+								<packageName></packageName>
+								<script>
+
+function abtn:run_multistate(nocmd)
+	local nocmd = nocmd or false
+	--if self.state &lt; 3 or not self.multistate then return end
+	--print('lets turn ' .. self.name .. ' on')
+	if self.funcs then
+		if self.funcs[self.state] then
+			self.funcs[self.state]()
+		end
+	end
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:sync()</name>
+								<packageName></packageName>
+								<script>--script will check reality and update the abtn to reflect it
+
+function abtn:sync()
+	local result = true
+	
+	if not self.check then
+		return false
+	end
+	
+	--deb('abtn.sync() result is inistiated as: ' .. str(result))
+	--deb(type(self.check) .. '   ' .. tostring(self.check) .. '   ' .. tostring( _G[self.check]))
+	if type(self.check) == 'function' then
+		result = self.check() or false
+		--deb(self.name .. ': ' .. str(result),3)
+	elseif type(self.check) == 'boolean' then
+		result = self.check or false
+	elseif type(self.check) == 'string' then
+		result = _G[self.check] or false
+	else
+		error("ABTN abtn:sync() wrong 'check' type for: " .. self.name)
+	end
+
+	--print(string.format('BUtton: %s    Result: %s, State: %s, Multistate: %s', self.name, str(result), str(self.state), str(self.multistate)))
+	
+	if type(result) == 'number' then
+		if self.state == result then return true
+		elseif self.multistate then
+			self:set_multistate(result)
+		elseif result == 1 then
+			self:off()
+		elseif result == 2 then
+			self:on()
+		else
+			error('abtn:sync() result is numerical but out of boundary: ' .. tostring(result) ..'. Possible causes: abtn not configured for multistate, or check() returning incorrect value.')
+		end
+	elseif type(result) == 'boolean' then
+  	if result then
+  		if self.state == 1 then
+  			self:on('nocmd')
+  		end
+		else
+			if self.state &gt; 1 then
+				self:off('nocmd')
+			end
+  	end
+	else
+		error('abtn:sync() result is neither number or boolean: ' .. type(result))
+	end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>apply_cssman()</name>
+								<packageName></packageName>
+								<script>function abtn:apply_cssman(cssman_set)
+
+	local state = tonumber(self.state)
+	local cssman_set = cssman_set or self.cssman[state]
+
+	--print( self.name .. ' is now in state: ' .. str(self.state) )
+
+
+	
+	for attribute,value in pairs(cssman_set) do
+		self.cssman.default:set(attribute, value)
+	end
+	
+	self[self.name .. '_label']:setStyleSheet(self.cssman.default:getCSS())
+	
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>example Multistate new</name>
+								<packageName></packageName>
+								<script>--[=[
+function DRAWexampleMSbtn()
+  	exampleMSbtn = abtn:new({
+  		name = 'exampleMSbtn',
+  		x = 900, y = 100, width = 100, height = 100,
+			multistate = 3,
+			cssman = {
+				default = lab.actionbtn,
+				[1] = {['background-color'] = 'rgba(66,66,66,0)', ['border-color'] = 'DimGrey',},
+				[2] = {['background-color'] = 'rgba(66,66,66,0)', ['border-color'] = 'MediumPurple',},
+				[3] = {['background-color'] = 'rgba(66,66,66,0)', ['border-color'] = 'DodgerBlue',},
+			},
+  		msgs = {
+				[1] = 'Hunting is off',
+  			[2] = 'Hunting with:&lt;br&gt;Swarm',
+				[3] = 'Hunting with:&lt;br&gt;Freeze',
+			},
+  		listento = 'nanoseer ui tick',
+			multistate = 3,
+  		check = function() return (teststatus == 'off' and 1) or (teststatus == 'swarm' and 2) or (teststatus == 'freeze' and 3) end,
+  		funcs = {
+				[1] = function() testrunstatus('swarm') end,
+  			[2] = function() testrunstatus('freeze') end,
+				[3] = function() testrunstatus('off') end,
+			},
+  	})
+end
+teststatus = 'freeze'
+function testrunstatus(mode)
+	local mode = mode or false
+	if not mode then
+		return teststatus
+	else
+		teststatus = mode
+		print('Teststatus is now: ' .. teststatus)
+	end
+end
+		--]=]
+</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>abtn:initvalues()</name>
+								<packageName></packageName>
+								<script>function abtn:initial_sync()
+	if self.cssman then
+		self:setStyleSheet(self.cssman.default:getCSS())
+		self:apply_cssman()
+	elseif self.css then
+		self:setStyleSheet(self.css[1])
+	end
+	
+	if self.msgs then
+		if self.msgs[1] then 
+			self:echo(self.msgs[1])
+		end
+	end
+	
+	self:sync()
+		
+		
+	
+end</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Debug echo system</name>
+							<packageName></packageName>
+							<script>function deb(msg, indent)
+	local indent  = indent or 0
+	if debugging then
+		if indent == 0  then echo('\n') end
+		print( string.format( '{%s%s}', string.rep(' ', indent), msg ) )
+	end
+end
+
+debugging = false</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Division - Whole number result</name>
+							<packageName></packageName>
+							<script>function DIV(a,b)
+    return (a - a % b) / b
+end</script>
+							<eventHandlerList />
+						</Script>
+					</ScriptGroup>
+					<ScriptGroup isActive="yes" isFolder="yes">
+						<name>Sandbox</name>
+						<packageName></packageName>
+						<script>lab.cols = {br = 'AntiqueWhite', d = 'AntiqueWhite', t = 'sienna', h = 'AntiqueWhite'}
+--[[
+setUnderline(true)
+setOverline(true)
+echo('\nTest test hello\n')
+resetFormat()
+]]
+--[=[
+local cols = {br = 'white', t = 'sienna',}
+local ID = 'item12345'
+cechoLink(
+	string.format(' &lt;%s&gt;[&lt;%s&gt;B&lt;%s&gt;]', cols.br, cols.t, cols.br), 	--text to display
+	string.format([[send('buy %s')]], ID), 												--command to send 
+	'Click to buy.'    																						--tooltip
+)
+--]=]
+
+
+lab.actionbtn = CSSMan.new([[
+  background-color: rgba(66,66,66,20);
+  border-style: solid;
+  border-width: 2px;
+  border-color: DimGrey;
+  border-radius: 2px;
+  margin: 3px;
+  qproperty-wordWrap: true;
+]])
+
+
+function testtest(flag)
+  testv = 'one'
+  print(testv)
+  _G[flag] = 'two'
+  print(flag)
+  print(testv)
+end</script>
+						<eventHandlerList />
+						<Script isActive="yes" isFolder="no">
+							<name>Combat Info</name>
+							<packageName></packageName>
+							<script>combat = combat or {}
+
+function combat.draw()
+	combat.container = Geyser.Container:new({name='combat.container'})
+	if GUIframe then GUIframe.addWindow(combat.container,"Combat","topleft") end
+
+	combat.console = Geyser.MiniConsole:new({
+		name = 'combat.console',
+		x = '1px', y = '1px',
+		width = '-2px', height = '50%',
+		color = 'black',
+		fontSize = 10,
+		}, combat.container)
+	combat.console:echo('Combat console...   online.\n')
+	
+	
+	combat.affconsole = Geyser.MiniConsole:new({
+		name = 'combat.affconsole',
+		x = '51%', y = '51%',
+		width = '-2px', height = '-1px',
+		color = 'black',
+		fontSize = 10,
+		}, combat.container)
+	combat.console:echo('Combat affliction console...   online.\n')
+	
+	combat.defconsole = Geyser.MiniConsole:new({
+		name = 'combat.defconsole',
+		x = '1px', y = '51%',
+		width = '50%', height = '-1px',
+		color = 'black',
+		fontSize = 10,
+		}, combat.container)
+	combat.console:echo('Combat affliction console...   online.\n')	
+	
+end
+
+registerAnonymousEventHandler('sysLoadEvent', function() combat.draw() end )</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>Wetwiring</name>
+								<packageName></packageName>
+								<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Mindsim</name>
+								<packageName></packageName>
+								<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Shipsim</name>
+								<packageName></packageName>
+								<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Aff Display</name>
+								<packageName></packageName>
+								<script>function combat.affdisplay()
+	clearWindow('combat.affconsole')
+	cecho('combat.affconsole', '\n&lt;sienna&gt;AFFLICTIONS')
+	local affs = Aff
+	for aff,pres in pairs(affs) do
+		cecho('combat.affconsole', string.format('\n&lt;grey&gt;%s', aff))
+	end
+end
+
+registerAnonymousEventHandler('got aff', function() combat.affdisplay() end )
+registerAnonymousEventHandler('lost aff', function() combat.affdisplay() end )</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Def Display</name>
+								<packageName></packageName>
+								<script>function combat.defdisplay()
+  clearWindow('combat.defconsole')
+  cecho('combat.defconsole', '\n&lt;sienna&gt;DEFENCES')
+  local defs = defs
+  for def, pres in pairs(defs) do
+    cecho('combat.defconsole', string.format('\n&lt;grey&gt;%s', def))
+  end
+end
+
+registerAnonymousEventHandler(
+  'def change',
+  function()
+    combat.defdisplay()
+  end
+)
+
+function combat.removedef(def)
+  if defs[def] then
+    defs[def] = nil
+  end
+  combat.defdisplay()
+end
+
+registerAnonymousEventHandler(
+  'lost def',
+  function(event, def)
+    combat.removedef(def)
+  end
+)</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Macro Integrations</name>
+							<packageName></packageName>
+							<script>function macro(key)
+
+  local key = macroTable[key][1] or key
+	
+	if type(macroTable[key]) == 'string' then key = macroTable[key] end
+
+  if type(key) == 'string' then
+    expandAlias(key, false)
+  elseif type(key) == 'function' then
+    key()
+  else
+    error('macro key needs to be string or function. Type: ' .. type(key))
+  end
+	
+end
+
+
+
+
+
+piloting = false
+
+function move(dir)
+  if piloting then
+    pilot(dir)
+  else
+    if dir == 'keydec' then
+      hunt.pickTar()
+      return
+    elseif dir == 'keyins' then
+      dir = 'fly'
+    end
+   -- print('dir is ' .. dir)
+    expandAlias(dir)
+  end
+end
+
+function pilot(dir)
+  local dirconv =
+    {
+      n = 'ship turn n',
+      ne = 'ship turn ne',
+      e = 'ship turn e',
+      se = 'ship turn se',
+      s = 'ship turn s',
+      sw = 'ship turn sw',
+      w = 'ship turn w',
+      nw = 'ship turn nw',
+      down = 'ship halt',
+      ['in'] = 'ship thrust full',
+      look = 'ship beacon',
+      keydec = 'ship weapon activate cannon',
+      ['out'] = 'ship thrust cruise',
+      up = 'ship thrust slow',
+      keyins = 'ship weapon autofire cannon',
+    }
+  --	if 			dir == 'up'  			then shipsys.setmaxspeed('up')
+  --	elseif	dir == 'down'			then shipsys.setmaxspeed('down')
+  --elseif 	dir == 'in'				then	
+  --elseif	dir == 'out' 			then
+  --elseif	dir == 'keydec'		then
+  --elseif	dir == 'keyins'		then
+  --	else
+  expandAlias(dirconv[dir])
+  --end
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>AB Skills</name>
+							<packageName></packageName>
+							<script>abskills = abskills or {}
+
+function abskills.create()
+  --container
+  abskills.container = Geyser.Container:new({name='abskills.container', x=0, y=0, width = '30%', height = '30%'})
+  -- where to put the container? GUIframe only option for now
+  if GUIframe then GUIframe.addWindow(abskills.container,'Skills',"topleft") end
+  -- the console itself
+  abskills.console = Geyser.MiniConsole:new({
+    name='abskills.console', 
+    x = '2px', y = '2px', 
+    width = '-4px', height = '-4px',
+    --autoWrap = false,
+    wrapAt = 90,
+    fontSize = 8,
+    scrollBar = false,
+    color = 'black',
+    }, abskills.container)
+  -- lets put something in the console so we know it exists
+  abskills.console:echo('AB Skill Lists')
+end
+
+
+registerAnonymousEventHandler('sysLoadEvent', function() abskills.create() end )
+
+
+
+</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Prompt stuff</name>
+							<packageName></packageName>
+							<script>prompt = prompt or {}
+prompt.hp = 1
+prompt.maxhp = 1
+</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>Prompt Health Display</name>
+								<packageName></packageName>
+								<script>function prompt.health()
+	local stats = stats
+  local col = 'ForestGreen'
+  
+  -- dynamic colouring
+  if stats.pchp &lt; 75 then col = 'gold' end
+  if stats.pchp &lt; 50 then col = 'DarkOrange' end
+  if stats.pchp &lt; 25 then col = 'red' end
+	
+	-- under/over line experiment
+	--setUnderline(true)
+	--setOverline(true)
+	
+	-- echo with cols
+	fg(col)
+	echo(stats.hp)
+	local pchp = str(stats.pchp)
+	echo(' (%.0f%%) ' %{pchp:align('right', 3, ' ')})
+	
+	resetFormat()
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Subsys Display</name>
+								<packageName></packageName>
+								<script>function prompt.subsys()
+	local stats = stats
+	local cols = {
+		muscular = {'sienna', 'DarkOrange', 'OrangeRed',},
+		internal = {'goldenrod', 'LightGoldenrod', 'yellow',},
+		sensory = {'DeepSkyBlue', 'LightSkyBlue', 'cyan',},
+		mind = {'DarkOrchid', 'MediumVioletRed', 'VioletRed',},
+		wetwiring = {'DarkGreen', 'SeaGreen', 'SpringGreen',},
+	}
+	local pickcol = function(subsys, n)
+		if n &lt; 50 then col = cols[subsys][3]
+		elseif n &lt; 90 then col = cols[subsys][2]
+		elseif n &lt; 100 then col = cols[subsys][1]
+		else	col = 'grey'
+		end
+		return col
+	end
+	
+	local subsystems = {'muscular', 'internal', 'sensory', 'mind', 'wetwiring'}
+	for _,subsys in ipairs(subsystems) do
+		local subsyshp = stats[subsys]
+		
+		if subsyshp &lt; 100 then
+  		local col = pickcol(subsys, subsyshp)
+    	
+    	-- echo with cols
+    	fg('grey')
+    	echo(' ')
+    	fg(col)
+    	echo('%.0f' %{subsyshp})
+    	fg('grey')
+		end
+	end
+
+	resetFormat()
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Resource Display</name>
+								<packageName></packageName>
+								<script>function prompt.resource()
+	prompt[ getclass() ]()
+end
+
+
+
+
+
+
+
+
+--[[resource display
+local res = ''
+if class == 'nanoseer' then
+	col = 'SteelBlue'
+	local maxnn = 100
+	if Def.miniaturisation then maxnn = maxnn - 35 end
+	if Def.protect then maxnn = maxnn - 10 end
+	if Def.alertness then maxnn = maxnn - 10 end
+	local res1 = string.format('&lt;SteelBlue&gt;NN: &lt;%s&gt;%s&lt;grey&gt;/&lt;%s&gt;%s', col, stats.pcnn, col, maxnn)
+elseif class == 'engineer' then
+	col = 'SteelBlue'
+	res = string.format('&lt;grey&gt;PT: &lt;%s&gt;%s&lt;grey&gt;', col, stats.pcnn)
+end
+
+--subsys display
+]]--</script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Engineer</name>
+									<packageName></packageName>
+									<script>function prompt.engineer()
+	local col = 'SteelBlue'
+	--setUnderline(true)
+	--setOverline(true)
+	local pt = stats.pt
+	local cols = {'LightSkyBlue', 'SkyBlue', 'OrangeRed',}
+	
+	if pt &lt; 25 then col = cols[3]
+	elseif pt &lt; 50 then col = cols[2]
+	elseif pt &lt; 75 then col = cols[1]
+	end
+	
+	fg(col)
+	echo('PT: ' .. pt .. ' ')
+	resetFormat()	
+end
+</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Scoundrel</name>
+									<packageName></packageName>
+									<script>function prompt.scoundrel()
+    local col = 'SteelBlue'
+    --setUnderline(true)
+    --setOverline(true)
+    local bl = stats.bl
+    local cols = {'LightSkyBlue', 'SkyBlue', 'OrangeRed',}
+    
+    if bl &lt; 1 then col = cols[3]
+    elseif bl &lt; 4 then col = cols[2]
+    elseif bl &lt; 9 then col = cols[1]
+    end
+    
+		echo('[')
+    fg(col)
+		local blchar = '*'
+		local emptychar = '-'
+    echo(blchar:rep(bl))
+		fg('grey')
+		echo(emptychar:rep(8-bl))
+		echo('] ')
+    resetFormat()   
+end
+</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Nanoseer</name>
+									<packageName></packageName>
+									<script>function prompt.nanoseer()
+	local col = 'SteelBlue'
+	--setUnderline(true)
+	--setOverline(true)
+	local res = stats.nn
+	local cols = {'LightSkyBlue', 'SkyBlue', 'OrangeRed',}
+	
+	if res &lt; 200 then col = cols[3]
+	elseif res &lt; 400 then col = cols[2]
+	elseif res &lt; 600 then col = cols[1]
+	end
+	
+	fg(col)
+	echo('NN: ' .. res .. ' ')
+	
+	res = stats.pcsa
+	cols = {'MediumOrchid', 'DarkOrchid', 'DarkViolet',}
+	
+	if res &lt; 30 then col = cols[3]
+	elseif res &lt; 60 then col = cols[2]
+	else col = cols[1]
+	end
+	
+	res = string.format("SA: %s/%s", tostring(stats.sa/10), tostring(stats.maxsa/10))
+	
+	fg(col)
+	echo(res)	
+	
+	
+	
+	
+	
+	
+	
+	resetFormat()	
+end
+</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>BEAST</name>
+									<packageName></packageName>
+									<script>function prompt.beast()
+	local col = 'SteelBlue'
+	--setUnderline(true)
+	--setOverline(true)
+	local pl = stats.pl
+	local cols = {'LightSkyBlue', 'OrangeRed', 'yellow',}
+	
+	if pl &gt; 400 then col = cols[1]
+	elseif pl &gt; 700 then col = cols[2]
+	elseif pl &gt; 900 then col = cols[3]
+	end
+	
+	fg(col)
+	echo('PL: ' .. pl .. ' ')
+	resetFormat()	
+end
+</script>
+									<eventHandlerList />
+								</Script>
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>HP CHange</name>
+								<packageName></packageName>
+								<script>function prompt.hpchange(hp)
+  local prevhp = tonumber(prompt.hp)
+  if prevhp ~= hp then
+    local diff = tostring(hp - prevhp)
+    local col = '&lt;green&gt;'
+    if hp &lt; prevhp then
+      col = '&lt;red&gt;'
+    end
+    cecho(string.format(' %s(%s)', col, diff))
+    prompt.hp = hp
+  end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Channelling</name>
+								<packageName></packageName>
+								<script>prompt.channelling = false
+function prompt.channel()
+
+	if prompt.channelling then
+		cecho('&lt;LightSkyBlue&gt; ..:((( %s ))):..' %{prompt.channelling})
+		
+	end
+
+
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Balances</name>
+								<packageName></packageName>
+								<script>function prompt.bals()
+
+	local stats = stats
+	
+	fg('white')
+	echo('[')
+	
+	if stats.bal then
+		--echo('')
+		bg('MediumBlue')
+		echo('B')
+		bg('black')
+		--echo('|')
+	else
+		echo('b')
+	end
+	
+	if stats.wwbal then
+		--echo(' ')
+		bg('ForestGreen')
+		fg('black')
+		echo('W')
+		bg('black')
+		fg('white')
+		echo('')
+	else
+		echo('w')
+	end		
+
+	echo(']')
+	resetFormat()
+
+end</script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Nanoseer Defs and Balances</name>
+									<packageName></packageName>
+									<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+</script>
+									<eventHandlerList />
+								</Script>
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Target Info</name>
+								<packageName></packageName>
+								<script>function prompt.target()
+  local tinfo = tarinfo
+	--
+	-- tinfo.id is false when no target is set
+  if tinfo.id then
+		-- pick a colour based on health
+    local col = 'ForestGreen'
+    if tinfo.hp &lt; 25 then
+      col = 'red'
+    elseif tinfo.hp &lt; 50 then
+      col = 'orange'
+    elseif tinfo.hp &lt; 75 then
+      col = 'yellow'
+    end
+		-- echo to prompt
+    local tname = hunt.nameconv[tinfo.name] or tinfo.name
+    cecho(string.format(' &lt;white&gt;[&lt;%s&gt;%s (%s)&lt;white&gt;]', col, tname, tinfo.hp))
+  end
+end</script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Tarinfo</name>
+									<packageName></packageName>
+									<script>tarinfo =  tarinfo or {}
+tarinfo.hp = false
+tarinfo.id = false
+tarinfo.name = false
+--
+-- function which parses info from gmcp.IRE.Target
+function tarinfo.parse()
+  if gmcp.IRE.Target.Info.id == '' then
+    tarinfo.hp = false
+    tarinfo.id = false
+    tarinfo.name = false
+  else
+    local hp = gmcp.IRE.Target.Info.hpperc
+    hp = hp:gsub('%%', '')
+    tarinfo.hp = tonumber(hp)
+    tarinfo.id = gmcp.IRE.Target.Info.id
+    tarinfo.name = gmcp.IRE.Target.Info.short_desc or tarinfo.name
+  end
+end
+--
+
+
+-- event handler
+if tarinfo.handlerID then
+  killAnonymousEventHandler(tarinfo.handlerID)
+end
+tarinfo.handlerID =
+  registerAnonymousEventHandler(
+    'gmcp.IRE.Target.Info',
+    function()
+      tarinfo.parse()
+    end
+  )
+--
+-- enable the gmcp.IRE.Target module
+if tarinfo.enableGMCP then
+  killAnonymousEventHandler(tarinfo.enableGMCP)
+end
+tarinfo.enableGMCP =
+  registerAnonymousEventHandler(
+    'sysProtocolEnabled',
+    function()
+      sendGMCP([[Core.Supports.Add ["IRE.Target 1"] ]])
+    end
+  )</script>
+									<eventHandlerList />
+								</Script>
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Gsags</name>
+								<packageName></packageName>
+								<script>prompt.gagnext = false
+
+function gagpr()
+  deleteLine()
+  prompt.gagnext = true
+end
+
+function gag()
+	deleteLine()
+end
+
+
+function prompt.gag()
+  if prompt.gagnext then
+    deleteLine()
+    prompt.gagnext = false
+  end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Queue</name>
+								<packageName></packageName>
+								<script>prompt.queued = false
+
+function prompt.queue()
+	if prompt.queued then
+		echo(' {%s}' %{prompt.queued})
+	end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Defs/Bals/Effects</name>
+								<packageName></packageName>
+								<script>prompt = prompt or {}
+prompt.effects = prompt.effects or {}
+--
+
+function prompt.effects.general()
+
+	--begin it
+  fg('white')
+  echo('[')
+	
+	--what info inside?
+  prompt.effects.pointzero()
+	prompt.effects.timeeffects()
+  prompt.effects[ getclass() ]()
+  
+	--wrap it up
+	fg('white')
+	echo(']')
+  resetFormat()
+end</script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Pointzero</name>
+									<packageName></packageName>
+									<script>function prompt.effects.pointzero()
+  if not pointzero:ready() then
+    fg('deep_sky_blue')
+    echo('&gt;&lt;')
+  end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Timeeffects</name>
+									<packageName></packageName>
+									<script>function prompt.effects.timeeffects()
+  if not roomsped:ready() then
+    fg('goldenrod')
+    echo('//')
+	elseif not roomslowed:ready() then
+    fg('SlateBlue')
+    echo([[\\]])
+  end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Nanoseer</name>
+									<packageName></packageName>
+									<script>function prompt.effects.nanoseer()
+	if seer.defs.frenzy then
+		fg('orange')
+		echo('F')
+	end
+	if seer.multistrike then
+		fg('SteelBlue')
+		echo('M')
+	end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Scoundrel</name>
+									<packageName></packageName>
+									<script>function prompt.effects.scoundrel()
+
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Engineer</name>
+									<packageName></packageName>
+									<script>function prompt.effects.engineer()
+
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Beast</name>
+									<packageName></packageName>
+									<script>function prompt.effects.beast()
+	if plasma.heatup then
+		fg('orange_red')
+		echo('H')
+	end
+  
+  --[[if pvp.affs.staggering then
+    fg('white')
+    echo('S')
+  end
+  --]]
+end</script>
+									<eventHandlerList />
+								</Script>
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Tartracker</name>
+								<packageName></packageName>
+								<script>prompt = prompt or {}
+prompt.tartracker = prompt.tartracker or {}
+--
+
+function prompt.tartracker.general()
+
+	--begin it
+  fg('white')
+  echo('[')
+	
+	--what info inside?
+  prompt.tartracker[ getclass() ]()
+  
+	--wrap it up
+	fg('white')
+	echo(']')
+  resetFormat()
+end</script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Nanoseer</name>
+									<packageName></packageName>
+									<script>function prompt.tartracker.nanoseer()
+
+  local info = pvp.scan or false
+  local getmindcol = function(subsys)
+    if      subsys &lt; 25   then return 'magenta'
+    elseif  subsys &lt; 50   then return 'VioletRed'
+    elseif  subsys &lt; 75   then return 'DarkViolet'
+    elseif  subsys &lt; 100  then return 'BlueViolet'
+    else
+      return 'LightSlateBlue'
+    end
+  end
+  
+   local getsensorycol = function(subsys)
+    if      subsys &lt; 25   then return 'DeepSkyBlue'
+    elseif  subsys &lt; 50   then return 'DodgerBlue'
+    elseif  subsys &lt; 75   then return 'ansiBlue'
+    elseif  subsys &lt; 100  then return 'ansiLightBlue'
+    else
+      return 'RoyalBlue'
+    end
+  end 
+  
+  local getwwcol = function(subsys)
+    if      subsys &lt; 50   then return 'GreenYellow'
+    elseif  subsys &lt; 75   then return 'green'
+    elseif  subsys &lt; 90   then return 'SpringGreen'
+    elseif  subsys &lt; 100  then return 'ForestGreen'
+    else
+      return 'DarkGreen'
+    end
+  end  
+   
+  
+  if info then
+    if info.freeze and info.freeze &gt; 0 then
+      cecho('&lt;cyan&gt;F:' .. str(info.freeze))
+    end
+    if info.mindaffs and info.mindaffs &gt; 0 then
+      cecho(string.format(" &lt;%s&gt;M:%s", getmindcol(info.mind), info.mindaffs))
+    end
+    if info.sensoryaffs and info.sensoryaffs &gt; 0 then
+      cecho(string.format(" &lt;%s&gt;S:%s", getsensorycol(info.sensory), info.sensoryaffs))
+    end
+    if info.wetwiring and info.wetwiring &lt; 98 then
+      cecho(string.format(" &lt;%s&gt;W:%s", getwwcol(info.wetwiring), info.wetwiring))
+    end      
+  end
+  
+
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Scoundrel</name>
+									<packageName></packageName>
+									<script>function prompt.tartracker.scoundrel()
+
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Engineer</name>
+									<packageName></packageName>
+									<script>function prompt.tartracker.engineer()
+
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Beast</name>
+									<packageName></packageName>
+									<script>function prompt.tartracker.beast()
+  
+  if pvp.affs.staggering then
+    fg('white')
+    echo('S')
+  end
+  
+  if pvp.affs.scorched then
+    fg('firebrick')
+    echo('S')
+  end
+  
+end</script>
+									<eventHandlerList />
+								</Script>
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Ship</name>
+								<packageName></packageName>
+								<script>function prompt.ship()
+	local col = 'SteelBlue'
+	local stats = shipsys.vitals
+	cecho(string.format("    &lt;green&gt;[ %s ] &lt;%s&gt;  [%s|%s] [%s] [%s|%s] [%s]", stats.compass, col, tostring(stats.speed), stats.throttle, stats.capacitor, stats.shield, stats.hull, stats.sector))
+
+end
+
+--[[
+splay(v)
+
+shipsys.vitals.speed = v.speed
+shipsys.vitals.maxspeedpc = v.maxspeedpc
+shipsys.vitals.hullpc = v.hullpc
+shipsys.vitals.shieldpc = v.shieldpc
+shipsys.vitals.capacitorpc = v.capacitorpc
+shipsys.vitals.shiploc = v.loc
+
+
+]]</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Prompt EM display</name>
+								<packageName></packageName>
+								<script>function prompt.EM()
+  if pvp.EM then
+    fg('yellow')
+    bg('DeepSkyBlue')
+    echo(' &gt;&lt;&gt;&lt; ')
+    resetFormat()
+  end
+end</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Shop Stock</name>
+							<packageName></packageName>
+							<script>shopsys = shopsys or {}
+
+function shopsys.stock(item)
+  clearCmdLine()
+  appendCmdLine("tt shop sully's stock " .. item .. ' for ')
+end
+
+function shopsys.reprice(item, price)
+  send("tt shop sully's unstock " .. item)
+  if price then
+    send("tt shop sully's stock " .. item .. ' for ' .. price)
+  else
+    clearCmdLine()
+    appendCmdLine("tt shop sully's stock " .. item .. ' for ')
+  end
+end
+
+function shopsys.unstock(item)
+  send("tt shop sully's unstock " .. item)
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>ArmourTracker</name>
+							<packageName></packageName>
+							<script>armour = armour or {}
+armour.atable = armour.atable or {}
+armour.cols = {
+	medium = 'DarkSalmon',
+	light = 'SteelBlue',
+	heavy = 'red',
+	worn = 'DarkSalmon',
+	h = 'SteelBlue',
+	t = 'cyan',
+	d = 'LightGrey',
+	w = 'DarkSalmon',
+	br = 'LightSkyBlue',
+	l = 'lavender',
+}
+
+function armour.msg(msg)
+	local cols = armour.cols
+	local pre = 'ArmourSys'
+	cecho("%s: &lt;%s&gt;%s" %{pre:csqbr(cols), cols.d, msg})
+end
+
+function armour.clear()
+	armour.atable = {}
+end</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>Add Armour to Table</name>
+								<packageName></packageName>
+								<script>function armour.add(id, slot, lname, qual, health, lvl, loc, msgornot)
+	local msgornot = msgornot or false
+	armour.atable[slot] = armour.atable[slot] or {}
+	armour.atable[slot][id] = {
+		slot = slot,
+		longname = lname,
+		loc = loc,
+		id = id,
+		quality = quality,
+		health = health,
+		level = lvl,
+		}
+	
+	if msgornot then
+		armour.msg('Adding %s in %s (%s): %s' %{slot, loc, id, lname})
+	end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Probeall</name>
+								<packageName></packageName>
+								<script>function armour.probeall()
+	--print('probeall called')
+	enableTrigger("Armour Probe Capture")
+	local disableArmourProber = tempTimer(4, function()
+	 		disableTrigger('Armour Probe Capture')
+	 end)
+	
+	for slot,subtable in pairs(armour.atable) do
+
+		for _,armourpiece in pairs(subtable) do
+			local probestring = 'probe'
+			if armourpiece.loc == 'wie' then probestring = 'armor probe' end
+			send('%s %s' %{probestring, armourpiece.id})
+		end
+	end
+
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Display Armour Table</name>
+								<packageName></packageName>
+								<script>function armour.showall(filter)
+	local cols = armour.cols
+	local twidth = 100
+	local border = '-'
+	local armourtable = armour.sort('level')
+	local padchar = ' '
+	local class = getclass()
+	local mylevel = getlevel()
+  local filter = filter or 'all'
+	
+	
+	-- first, the main heading
+	cecho('\n&lt;%s&gt;%s&lt;%s&gt; %s &lt;%s&gt;%s' %{cols.h, border:rep(44), cols.t, 'ARMOUR LIST', cols.h, border:rep(43)})
+	
+	-- loop through armour slots
+	local resorder = {'impact', 'em', 'thermal', 'cellular', 'mental', 'draining', 'electric'}
+	for slot,subarmourtable in pairs(armourtable) do
+		-- The subheadings
+		cecho('\n&lt;%s&gt;%s &lt;%s&gt;%s &lt;%s&gt;%s' %{
+			cols.h, border:rep(2), 
+			cols.t, slot:upper(), 
+			cols.h, border:rep(53)
+			}
+		)
+		--resistance headings
+		for _,res in ipairs(resorder) do
+			cecho('&lt;%s&gt;|&lt;%s&gt;%s' %{
+  			cols.br, 
+  			cols.d, 
+  			res:cut(2):align('left',2)
+  			}
+  		)
+  	end
+  		cecho('&lt;%s&gt;|' %{cols.br})	
+		cecho('&lt;%s&gt;%s' %{cols.h, border:rep(10)})
+		--
+		-- loop through the sub-tables
+		for _,armourpiece in ipairs(subarmourtable) do
+			local id = armourpiece.id
+			local alev = tonumber(armourpiece.level)
+		
+		-- The armourpiece lines
+		
+			local col = cols.d
+			--print('\n' .. armourpiece.grade .. ' ' ..col)
+			if armourpiece.grade == 'heavy' then col = cols.heavy end
+		--	if armourpiece.grade == 'medium' then col = cols.medium end
+		--	if armourpiece.grade == 'llight' then col = cols.light end
+			
+			--print('\n' .. armourpiece.grade .. ' ' ..col)
+
+			if alev &gt; mylevel then
+				col = 'grey'
+			end
+			if armourpiece.loc == 'wie' then
+				col = cols.worn
+			end
+			
+			
+					
+			cecho('\n &lt;%s&gt;%s&lt;%s&gt;%s &lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;]&lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;]&lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;]&lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;]&lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;] ' %{
+			col, id:align('left', 8, padchar),
+			col, armourpiece.longname:cut(30):align('left', 30, padchar),
+			cols.br, col, armourpiece.loc, cols.br,
+			cols.br, col, armourpiece.level:align('right', 2, padchar), cols.br,
+			cols.br, col, armourpiece.grade:cut(1):align('left', 1, padchar), cols.br,
+			cols.br, col, armourpiece.health:align('right', 3, padchar), cols.br,
+			cols.br, col, armourpiece.smartcore:align('left', 1, padchar), cols.br,
+				}
+			)
+			--display(armourpiece)
+  			--resistances!
+  		for _,resname in ipairs(resorder) do
+				--display(armourpiece[resname])
+  			local resval = tostring(math.floor(armourpiece[resname] + 0.5))
+  			cecho('&lt;%s&gt;|&lt;%s&gt;%s' %{
+  				cols.br, 
+  				col, 
+  				resval:align('right',2)
+  				}
+  			)
+  		end
+  		
+  		cecho('&lt;%s&gt;|' %{cols.br})	
+			
+			
+			
+			
+			
+			
+			-- the links
+	  		local link
+	  		
+	  		if armourpiece.loc == 'inv' then
+	  			link = 'W'
+	  			cLinkify(' ' .. link:csqbr(cols), 'Click to wear.', [[send('armor upgrade %s with %s')]], {slot,id})			
+	  		end
+	  		
+	  		link = 'J'
+	  		cLinkify(' ' .. link:csqbr(cols), 'Click to junk.', [[sendAll('junk scrap %s', 'agree')]], id)
+				
+	  		link = 'R'
+	  		cLinkify(' ' .. link:csqbr(cols), 'Click to repair.', [[sendAll('armour repair %s', 'armour repair %s confirm')]], {slot, slot})
+				
+	  		
+	  		link = 'S'
+	  		cLinkify(' ' .. link:csqbr(cols), 'Click to stock in shop.', [[clearCmdLine() appendCmdLine('tt shop lightarmour stock %s for ')]], id)
+			
+			
+		end
+			echo('\n')
+	end
+	-- bottom border
+	cecho('\n&lt;%s&gt;%s' %{cols.h, border:rep(100)})
+end
+
+--local tstring = '123'
+--print(tstring:align('center', 20, '='))</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>armour.sort</name>
+								<packageName></packageName>
+								<script>function armour.sort(sortby)
+  --first we need to create a set of indexed lists
+  armour.indexify()
+  for slot, subtable in pairs(armour.iatable) do
+    table.sort(
+      armour.iatable[slot],
+      function(a, b)
+        if a.grade ~= b.grade then
+          return a.grade &gt; b.grade
+        end
+        return tonumber(a.level) &gt; tonumber(b.level)
+      end
+    )
+  end
+  return armour.iatable
+end
+
+--[[    table.sort(
+      armour.iatable[slot],
+      function(a, b)
+        return a.level &gt; b.level
+      end
+    )]]
+--
+--[[
+        if a.grade ~= b.grade then
+            return a.grade &gt; b.grade
+        end
+]]
+--		
+--print('Sorting by level: ' .. a.level ' &lt;--&gt; ' .. b.level)</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>armour.indexify</name>
+								<packageName></packageName>
+								<script>function armour.indexify()
+  armour.iatable = {}
+  for slot, subtable in pairs(armour.atable) do
+    armour.iatable[slot] = {}
+		--print(slot)
+		--display(subtable)
+    for id, armourpiece in pairs(subtable) do
+			--echo('\n' .. id)
+			--local grade = armourpiece.grade
+			--echo('  ' .. grade)
+      --if not armour.iatable[slot][grade] then
+        --armour.iatable[slot][grade] = {}
+      --end
+      table.insert(armour.iatable[slot], armourpiece)
+    end
+  end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="no" isFolder="no">
+								<name>NewScript</name>
+								<packageName></packageName>
+								<script>local t = {
+	{a=1, b=5, c='inv'},
+	{a=2, b=4, c='worn'},
+	{a=3, b=3, c='inv'},
+	{a=4, b=2, c='inv'},
+	{a=5, b=1, c='worn'},
+}
+
+local printseq = function()
+	print('++++++++++++++++++++++++')
+	for i,tab in ipairs(t) do
+		print("%s: %s  %s  %s" %{str(i), str(tab.a), str(tab.b), str(tab.c)})
+	end
+end
+
+printseq()
+    -- sort
+    table.sort(t, function(a, b)
+        if a.c ~= b.c then
+            return a.c &lt; b.c
+        end
+
+        return a.a &gt; b.a
+    end)
+
+printseq()
+--table.sort(testItable, function(a,b) return a.c &lt; b.c end)
+--printseq()
+
+
+--[[function mysort(s)
+    -- convert hash to array
+    local t = {}
+    for k, v in pairs(s) do
+        table.insert(t, v)
+    end
+
+    -- sort
+    table.sort(t, function(a, b)
+        if a.players ~= b.players then
+            return a.players &gt; b.players
+        end
+
+        return a.visits &gt; b.visits
+    end)
+    return t
+end]]--</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Weaptracker</name>
+							<packageName></packageName>
+							<script>weaponry = weaponry or {}
+weaponry.wtable = weaponry.wtable or {}
+weaponry.cols = {
+	br = 'SlateGray', 
+	d = 'SteelBlue',
+	t = 'LightBlue',
+	h = 'SlateGray',
+}
+
+function weaponry.msg(msg)
+	local cols = weaponry.cols
+	local pre = 'Weapsys'
+	cecho("%s: &lt;%s&gt;%s" %{pre:csqbr(cols), cols.d, msg})
+end
+
+function weaponry.clear()
+	weaponry.wtable = {}
+end
+
+
+
+
+--[[
+local tstring = '12345'
+echo(tstring:padleft(6, '-'))
+cecho( tstring:csqbr(weaponry.cols, 'left', 10, '-'))
+]]--</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>Add Weapon to Table</name>
+								<packageName></packageName>
+								<script>function weaponry.add(id, sname, lname, loc, msgornot)
+	local msgornot = msgornot or false
+	weaponry.wtable[sname] = weaponry.wtable[sname] or {}
+	weaponry.wtable[sname][id] = {
+		shortname = sname,
+		longname = lname,
+		loc = loc,
+		id = id,
+		}
+	
+	if msgornot then
+		weaponry.msg('Adding %s in %s (%s): %s' %{sname, loc, id, lname})
+	end
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Proball</name>
+								<packageName></packageName>
+								<script>function weaponry.probeall()
+	--print('probeall called')
+	enableTrigger("Weapon Probe Capture")
+	local disableWeaponProber = tempTimer(4, function()
+	 		disableTrigger('Weapon Probe Capture')
+	 end)
+	
+	for wtype,subtable in pairs(weaponry.wtable) do
+
+		for _,weap in pairs(subtable) do
+			local probestring = 'probe'
+			if weap.loc == 'mwp' then
+				probestring = 'mwp probe'
+			end
+			send('%s %s' %{probestring, weap.id})
+		end
+	end
+
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Display Weapon Table</name>
+								<packageName></packageName>
+								<script>function weaponry.showall()
+	local cols = weaponry.cols
+	local twidth = 100
+	local border = '-'
+	local weaptable = weaponry.sort('level')
+	--display(weaptable)
+	local padchar = ' '
+	local class = getclass()
+	local mylevel = getlevel()
+	
+	
+	-- first, the main heading
+	cecho('\n&lt;%s&gt;%s&lt;%s&gt; %s &lt;%s&gt;%s' %{cols.h, border:rep(44), cols.t, 'WEAPON LIST', cols.h, border:rep(43)})
+	
+	-- loop through weapon types
+	for wtype,subweaptable in pairs(weaptable) do
+		-- The subheadings
+		cecho('\n&lt;%s&gt;%s &lt;%s&gt;%s &lt;%s&gt;%s' %{
+			cols.h, border:rep(2), 
+			cols.t, wtype:upper(), 
+			cols.h, border:rep(twidth-wtype:len()-4)
+			}
+		)
+		--
+		-- loop through the sub-tables
+		for _,weapon in ipairs(subweaptable) do
+			local id = weapon.id
+			local wlev = tonumber(weapon.level)
+		
+		-- The weapon lines
+		
+			local cols = table.deepcopy(cols)
+			if wlev &gt; mylevel then
+				cols.d = 'grey'
+			end
+			if weapon.loc == 'wie' or weapon.loc == 'mwp' then
+				cols.d = 'sienna'
+			end
+			
+					
+			cecho('\n &lt;%s&gt;%s&lt;%s&gt;%s &lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;] &lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;] &lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;] &lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;] &lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;] &lt;%s&gt;[&lt;%s&gt;%s&lt;%s&gt;]' %{
+			cols.d, id:align('left', 8, padchar),
+			cols.d, weapon.longname:align('left', 32, padchar),
+			cols.br, cols.d, weapon.durability, cols.br,
+			cols.br, cols.d, weapon.loc, cols.br,
+			cols.br, cols.d, weapon.level:align('right', 2, padchar), cols.br,
+			cols.br, cols.d, weapon.power:align('right', 5, padchar), cols.br,
+			cols.br, cols.d, weapon.health:align('right', 3, padchar), cols.br,
+			cols.br, cols.d, weapon.genelock:cut(1):align('left', 1, padchar):title(), cols.br,
+				}
+			)
+		-- the links
+  		local link
+  		
+			
+			
+		--[=[	if class == 'beast' then
+			--	print(weapon.shortname)
+				link = ' '
+				if id == mwp[weapon.shortname] then
+					link = 'X'
+				end
+    		cLinkify(' ' .. link:csqbr(cols), 'Click to mark as preferred MWP', [[mwp.setweapon('%s', '%s')]], {weapon.shortname,id})		
+			end
+			--]=]
+			
+			
+  		if weapon.loc == 'inv' then
+  			link = 'W'
+  			if class == 'beast' then
+  				cLinkify(' ' .. link:csqbr(cols), 'Click to wield.', [[mwp.mount('%s', '%s')]], {weapon.shortname, id})
+  			else
+  				cLinkify(' ' .. link:csqbr(cols), 'Click to wield.', [[send('wield %s')]], id)
+  			end
+  			
+  		end
+  		
+  		link = 'J'
+  		cLinkify(' ' .. link:csqbr(cols), 'Click to junk.', [[send('junk scrap %s')]], id)
+			
+  		link = 'R'
+  		cLinkify(' ' .. link:csqbr(cols), 'Click to repair.', [[sendAll('weapon repair %s', 'weapon repair %s confirm')]], {id, id})
+			
+  		
+  		link = 'S'
+  		cLinkify(' ' .. link:csqbr(cols), 'Click to stock in shop.', [[clearCmdLine() appendCmdLine('tt shop stuff stock %s for 1000;;tt shop stuff categorize %s PIECE')]], {id,id})
+
+
+
+		end
+	end
+	-- bottom border
+	cecho('\n&lt;%s&gt;%s' %{cols.h, border:rep(100)})
+end
+
+--local tstring = '123'
+--print(tstring:align('center', 20, '='))</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>weaponry.sort</name>
+								<packageName></packageName>
+								<script>function weaponry.sort(sortby)
+	weaponry.indexify()
+	for wtype,itable in pairs(weaponry.iwtable) do
+		table.sort(weaponry.iwtable[wtype], function(a,b) return a.power &gt; b.power end)
+	end
+	
+	return weaponry.iwtable
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Create Indexed Wtable</name>
+								<packageName></packageName>
+								<script>function weaponry.indexify()
+
+	weaponry.iwtable = {}
+	for wtype,subtable in pairs(weaponry.wtable) do
+		weaponry.iwtable[wtype] = {}
+		for id,weapon in pairs(subtable) do
+			table.insert(weaponry.iwtable[wtype], weapon)
+		end
+	end
+
+
+
+end</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>newFSM</name>
+							<packageName></packageName>
+							<script>--fsm
+fsm = {}
+fsm.__index = fsm
+--[[
+fsm script needs to:
+	1. Be a list in order of strategy
+	2. Order must be adjustable
+	3. Each 'item' must contain: name, event, checkfunc
+	4. Transition-to not required as it is assumed next item in list always
+	5. 
+]]--
+
+
+function fsm:new(name, event)
+	local self = {}
+	setmetatable(self,fsm)
+	self.name = name --name of fsm/strategy
+	self.stt = {} --stt refers to 'state transition table'
+	self.state = 1 --by default, start at 1
+	self.active = false --start paused by default
+	self.dofunc = function() 
+		self.stt[self.state].dofunc()	
+	end
+	
+	self.event = event
+	
+	self.eventID = registerAnonymousEventHandler(event, function() if self.active then self.dofunc() end end)
+
+	return self
+end
+
+
+function fsm:add(name, event, dofunc, checkfunc, event_behaviour)
+	table.insert(self.stt, {name = name, event = event, dofunc = dofunc, checkfunc = checkfunc, event_behaviour = event_behaviour})
+	if event_behaviour == 'always' then
+		local state
+		for n,strat in ipairs(self.stt) do
+			if strat.name == name then state = n end
+		end
+		
+		self.stt[state]['eventID'] = registerAnonymousEventHandler(event, function() self.stt[state].checkfunc() end)
+	
+	end
+	
+	self:show()
+end
+
+
+
+
+
+function fsm:start()
+	self.active = true
+	if not self.stt[self.state].eventID then 		
+		self.stt[state]['eventID'] = registerAnonymousEventHandler(event, function() self.stt[state].checkfunc() end)
+	end		
+	self:alert('Starting %s. Current state: %s' %{self.name, self.stt[self.state]['name']})
+end
+
+function fsm:pause()
+	self.active = false
+	self:alert('Pausing %s. Current state: %s' %{self.name, self.stt[self.state]['name']})
+end
+
+function fsm:get()
+	return self.state
+end
+
+function fsm:set(state)
+	local statenum = state
+	if type(state) == 'string' then
+		for n,strat in ipairs(self.stt) do
+			if strat.name == state then statenum = n end
+		end
+	end
+
+	self.state = statenum
+	self:alert('Setting state for %s. New state: %s' %{self.name, self.stt[self.state]['name']})
+end
+
+function fsm:show()
+	display(stt)
+end
+
+function fsm:alert(msg)
+	cecho("\n&lt;white&gt;[&lt;sienna&gt;fsm&lt;white&gt;]: &lt;grey&gt;" .. msg)
+end
+
+
+function fsm:fire(state)
+	local state = state or self.state
+	if #self.stt == state then
+		self:alert('%s is complete.' %{self.name} )
+	else
+		local oldstate = self.state
+		if self.stt[self.state].eventID and self.stt[self.state].event_behaviour == 'normal' then 		
+			killAnonymousEventHandler( self.stt[state]['eventID'])
+		end
+		self.state = state + 1
+  	if not self.stt[self.state].eventID then 		
+  		self.stt[state]['eventID'] = registerAnonymousEventHandler(event, function() self.stt[state].checkfunc() end)
+  	end
+		self:alert("%s advancing from %s to %s" %{self.name, self.stt[oldstate]['name'], self.stt[self.state]['name']})
+	end
+
+end
+
+ function fsm:check(state)
+ 	local state = state or self.state
+ 	if self.active and self.stt[state]['checkfunc']() then
+		self:alert('conditions met')
+ 		self:fire(state)
+ 	end
+ end</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>testFSM</name>
+								<packageName></packageName>
+								<script>testFSM =
+  fsm:new(
+    'testFSM',
+    'balorqueue',
+    function()
+      print('central dofunc successfully running')
+    end
+  )
+--	
+--function fsm:add(name, event, dofunc, checkfunc, event_behaviour)
+testbool = false
+testtargetisdead = false
+--
+
+testFSM:add(
+  'Opener',
+  'bot harass',
+  function()
+    print('bot harass &lt;target&gt;')
+  end,
+  function()
+    return testbool
+  end
+)
+--
+testFSM:add(
+  'Claw',
+  'target dead',
+  function()
+    return testtargetisdead
+  end
+)
+--
+testFSM:add(
+  'Healup',
+  'all healed up',
+  function()
+    local myhealth = true
+    if stats.pchp &lt; 80 then
+      myself = false
+    end
+    return myhealth
+  end
+)</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Simple State Machine</name>
+							<packageName></packageName>
+							<script>--simple strategy machine
+ssm = ssm or {}
+ssm.strats = {}
+ssm.strats.default = {'oblivion speedup', 'voidism pointzero', 'voidism freeze', }
+ssm.cstrat = 'default'
+ssm.step = 1
+ssm.active = false
+
+function ssm:wait()
+  local strat = ssm.strats[ssm.cstrat]
+  ssm.msg('Waiting for: ' .. strat[ssm.cstrat] .. ' before advancing.')
+end
+
+function ssm:iswait()
+  local strat = ssm.strats[ssm.cstrat]
+  local step = strat[ssm.step]
+  if step:find('wait') then 
+    return true 
+  else 
+    return false 
+  end
+end
+
+function ssm:fire(event, run)
+  local run = run or false
+  local strat = ssm.strats[ssm.cstrat]
+	
+	if not strat[ssm.step]:find(event) then
+		if event ~= 'forcefire' then
+			ssm:msg('Irrelevent event: ' .. event .. ' waiting for: ' .. strat[ssm.step] .. ' instead.')
+			return
+		end
+	end
+	
+  if #strat ~= ssm.step then
+    ssm.step = ssm.step + 1
+  end
+  if run then 
+    ssm:run() 
+  else
+    ssm:msg('SSM fired. Awaiting further input before running.')
+  end
+	
+	local srep = ssm.cstrat .. ': '
+	for i,step in ipairs(strat) do
+		local col = '&lt;green&gt;'
+		if i == ssm.step then
+			col = '&lt;red&gt;'
+		end
+		srep = srep .. col .. step
+		if i ~= #strat then
+			srep = srep .. '&lt;white&gt;, '
+		end	
+	end
+	
+end
+
+function ssm:pause()
+  ssm.active = false
+end
+
+function ssm:start(strat)
+  ssm.active = true
+  ssm:run()
+end
+
+function ssm:reset()
+  ssm.step = 1
+  ssm:pause()
+end
+
+function ssm:set(strat)
+  if not strat then 
+		ssm:msg('Set requires strategy to be passed as string or table.')
+	end
+  if type(strat) == 'string' then
+    if ssm.strats[strat] then
+      ssm.cstrat = strat
+      ssm:msg('Strat set to: ' .. strat)
+      ssm.reset()
+    else
+      ssm:msg(strat .. ' strategy does not exist.')
+    end
+  elseif type(strat) == 'table' then
+    ssm.strats.temp = strat
+    ssm.cstrat = temp
+    
+    local s = ''
+    for i,step in ipairs(strat) do
+      s = s .. strat
+      if i ~= #strat then
+        s = s .. ' &gt; '
+      end
+    end
+
+    ssm:msg('Temp strat: ' .. s)
+  else
+    ssm:msg('Cannot set strat of type: '.. type(strat))
+  end
+
+end
+
+
+
+
+function ssm:run()
+  local strat = ssm.strats[ssm.cstrat]
+  if not ssm:iswait() then
+    expandAlias(strat[ssm.step])
+  else
+    ssm:wait()
+  end
+end
+
+function ssm:msg(msg)
+	cecho("\n&lt;white&gt;[&lt;sienna&gt;fsm&lt;white&gt;]: &lt;grey&gt;" .. msg)
+end</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>Event handlers</name>
+								<packageName></packageName>
+								<script>ssm = ssm or {}
+
+function ssm.eventhandler(eventtype, event)
+	ssm:msg(event .. ' fired. Type: ' .. eventtype)
+	ssm:fire(event)
+end
+
+if ssm.eventhandlerID then killAnonymousEventHandler( ssm.eventhandlerID ) end
+--ssm.eventhandlerID = registerAnonymousEventHandler('ability used', function(eventname, eventarg) ssm.eventhandler('abilityused', eventarg) end)
+
+if ssm.waitingforID then killAnonymousEventHandler( ssm.waitingforID ) end
+--ssm.waitingforID = registerAnonymousEventHandler('ability fired', function(eventname, eventarg) ssm.eventhandler('abilityfired', eventarg) end)
+
+function ssm.listenfor(event)
+	if event == 'target slain' then
+		ssm:pause()
+	end
+	ssm:msg('Target is down, pausing SSM.')
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>gui controls</name>
+								<packageName></packageName>
+								<script>function ssm.draw()
+	ssm.container = Geyser.Container:new({
+		name = 'ssm.container',
+		x = 500, y = 400,
+		width = '30%', height = '16%',
+	})
+	
+	local grid = calc_grid(2,3)
+	
+	--ssm
+	
+	
+	
+
+end
+</script>
+								<eventHandlerList />
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Evade Testing</name>
+							<packageName></packageName>
+							<script>evtest = evtest or {}
+evDB = evDB or {}
+
+
+function evtest.attack(name, attack)
+	local name = target
+	evDB[name] = evDB[name] or {}
+	if not evDB[name][attack] then
+		evDB[name][attack] = {
+			full = {},
+			evaded = {},
+		}
+	end
+	evtest.trigger = true
+	evtest.attk = attack
+	evtest.name = name
+	evtest.healing = 0
+	evtest.hp = tonumber(prompt.hp)
+	evtest.hit = 'full'
+	setTriggerStayOpen('Evtest Trigger', 1)
+end
+
+function evtest.evaded()
+	evtest.hit = 'evaded'
+end
+
+function evtest.healed(amt)
+	evtest.healing = amt
+end
+
+function evtest.prompt()
+	print(evtest.hp .. '-' .. stats.hp .. '+' .. evtest.healing)
+	local dam = evtest.hp - stats.hp + evtest.healing
+	table.insert( evDB[evtest.name][evtest.attk][evtest.hit], dam)
+	evtest.attk = false
+	setTriggerStayOpen('Evtest Trigger', 1)
+end
+
+--evtest calc
+
+function evtest.display()
+	local results = {
+		full = 0,
+		evaded = 0,
+		totalfulldam = 0,
+		totalevadeddam = 0,
+	}
+	--
+	for mobid,mobresults in pairs(evDB) do
+		for attk,attkresults in pairs(mobresults) do
+			for hit,hitresults in pairs(attkresults) do
+				for _,dam in ipairs(hitresults) do
+					results[hit] = results[hit] + 1
+					results['total' .. hit .. 'dam'] = results['total' .. hit .. 'dam'] + dam
+				end
+			end
+		end
+	end
+	--
+	results.meanfull = results.totalfulldam / results.full
+	results.meanevaded = results.totalevadeddam / results.evaded
+	results.meanreducted = results.meanfull - results.meanevaded
+	results.reduction = results.meanreducted / results.meanfull *100
+	results.chance = results.evaded / (results.evaded + results.full) * 100
+	--
+	cecho('\n&lt;sienna&gt;-- Evasion Test results ---------------------------------')
+	cecho('\nTotal test size: ' .. results.full + results.evaded )
+	cecho('\nTotal evaded: %s' %{results.evaded} )
+	cecho('\nMean damage of evaded: %.1f' %{ results.meanevaded })
+	cecho('\nTotal full hits: ' .. results.full )
+	cecho('\nMean damage of full hits: %.1f' %{ results.meanfull })
+	cecho('\n----')
+	cecho('\nReduction: %.1f     Chance to evade: %.1f' %{results.reduction, results.chance } )
+	cecho('\n&lt;sienna&gt;---------------------------------------------')
+
+
+
+
+
+
+
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Ship System</name>
+							<packageName></packageName>
+							<script>shipsys = shipsys or {}
+function shipsys.msg(msg)
+	local cols = shipsys.cols
+	local xo = string.csqbr('Simo', cols)
+	
+	
+	cecho('%s: &lt;%s&gt;%s' %{xo, cols.t, msg})
+end
+
+shipsys.dirconv = {northwest = 'nw', north = 'n', northeast = 'ne', east = 'e', southeast = 'se', south = 's', southwest = 'sw', west = 'w'}</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>ShipSys Colour Table</name>
+								<packageName></packageName>
+								<script>shipsys.cols =  {
+      br = 'SteelBlue',
+      d = 'AntiqueWhite',
+      t = 'aquamarine',
+      h = 'DeepSkyBlue',
+      b = 'MediumOrchid',
+      scatterhome = 'sienna',
+      song = 'magenta',
+      celestine = 'cyan',
+      npc = 'white',
+    }</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>CSS</name>
+								<packageName></packageName>
+								<script>shipsys = shipsys or {}
+shipsys.css = shipsys.css or {}
+
+shipsys.css.back = [[
+	background-color: rgba(100,0,0,0);
+	border-style: solid;
+	border-color: DimGrey;
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 3px;
+]]
+
+shipsys.css.front = [[
+	background-color: rgba(0,0,0,0);
+	border-style: solid;
+	border-color: DimGrey;
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 3px;
+]]
+
+shipsys.css.text = [[
+	background-color: rgba(0,0,0,0);
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 3px;
+	qproperty-alignment: 'AlignCenter | AlignCenter';
+]]
+
+shipsys.css.label = [[
+	background-color: rgba(0,0,0,0);
+	border-style: solid;
+	border-color: DimGrey;
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 3px;
+]]</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>updateVitals</name>
+								<packageName></packageName>
+								<script>function shipsys.updateVitals(sys,val)
+
+	shipsys.vitals[sys] = val
+	shipsys.controls[sys].obj:setValue(val, 100)
+
+
+
+end</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Ship System</name>
+								<packageName></packageName>
+								<script>shipsys = shipsys or {}
+shipsys.vitals = {
+	speed = 0,
+	maxspeedpc = 0,
+	hullpc = 100,
+	shieldpc = 100,
+	capacitorpc = 100,
+	shiploc = 'lost in space',
+	powerpc = 0,
+	enginesys = 100,
+	shieldsys = 100,
+	capacitorsys = 100,
+	shipsimsys = 100,
+	sensorsys = 100,
+}
+shipsys.controls = shipsys.controls or {}
+
+shipsys.cols = {
+	br = 'SlateGray', 
+	d = 'SteelBlue',
+	t = 'LightBlue',
+	h = 'SlateGray',
+	
+}
+
+function shipsys.draw()
+	local cols = shipsys.cols
+	shipsys.controls.container = Geyser.Container:new({name = 'shipsys.controls.container'})
+	GUIframe.addWindow(shipsys.controls.container, 'Ship Controls', 'bottom')
+	
+	local controlslist = {
+		speed = {'throttle'},
+		general = {'speed', 'maxspeedpc', 'hullpc', 'shieldpc', 'capacitorpc', 'shipsimpc', 'powerpc'},
+		syshealth = {'enginesys','shieldsys', 'capacitorsys', 'shipsimsys', 'sensorsys',},
+		weapons = {'weapon1', 'weapon2', },
+	}
+	
+	--first we want to calculat the total number of controls
+	local totalcontrols = 0
+	for groupname,controlgroup in pairs(controlslist) do
+		totalcontrols = totalcontrols + #controlgroup
+	end
+	print(totalcontrols)
+	local grid = calc_grid(1, totalcontrols)
+	local gridpos = 1
+
+	
+	--firstly, a throttle control
+	shipsys.controls.throttle = {}
+	shipsys.controls.throttle.obj = Geyser.Label:new({
+		name = 'shipsys.controls.throttle.obj',
+		x = grid[gridpos].x, grid[gridpos].y,
+		width = grid[gridpos].width, height = grid[gridpos].height,
+		message = 'Throttle',
+		}, shipsys.controls.container)
+	--shipsys.controls.throttle.obj:setStyleSheet(shipsys.css.label:getCSS())
+	gridpos = gridpos + 1
+
+
+	-- then general controls
+	for i,ctrl in ipairs(controlslist.general) do
+  	shipsys.controls[ctrl] = {}
+		shipsys.controls[ctrl].obj = Geyser.Gauge:new({
+  		name = 'shipsys.controls.' .. ctrl .. '.obj',
+  		x = grid[gridpos].x, grid[gridpos].y,
+  		width = grid[gridpos].width, height = grid[gridpos].height,
+			orientation = 'vertical',
+  		}, shipsys.controls.container)
+		shipsys.controls[ctrl].obj:setText(ctrl:title())
+		shipsys.controls[ctrl].css = {}
+		shipsys.controls[ctrl].css.front = CSSMan.new(shipsys.css.front)
+		shipsys.controls[ctrl].obj.front:setStyleSheet(shipsys.controls[ctrl].css.front:getCSS())
+		--shipsys.controls[ctrl].obj.back:setStyleSheet(shipsys.css.back:getCSS())
+		--shipsys.controls[ctrl].obj.text:setStyleSheet(shipsys.css.text:getCSS())
+		shipsys.controls[ctrl].css.front:set("background-color",'green')
+		shipsys.controls[ctrl].obj:setValue(70,100)
+		gridpos = gridpos + 1
+	end
+
+	--then shipsys weapon controls
+	for i,ctrl in ipairs(controlslist.weapons) do
+		--print('%s in gpos: %s x:%s y:%s, w:%s, h:%s' %{ctrl, gridpos, grid[gridpos].x, grid[gridpos].y, grid[gridpos].width, grid[gridpos].height})
+  	shipsys.controls[ctrl] = {}
+		shipsys.controls[ctrl].obj = Geyser.Gauge:new({
+  		name = 'shipsys.controls.' .. ctrl .. '.obj',
+  		x = grid[gridpos].x, grid[gridpos].y,
+  		width = grid[gridpos].width, height = grid[gridpos].height,
+			orientation = 'vertical',
+  		}, shipsys.controls.container)
+		shipsys.controls[ctrl].obj:setText(ctrl:title())
+		--shipsys.controls[ctrl].obj.front:setStyleSheet(shipsys.css.front:getCSS())
+		--shipsys.controls[ctrl].obj.back:setStyleSheet(shipsys.css.back:getCSS())
+		--shipsys.controls[ctrl].obj.text:setStyleSheet(shipsys.css.text:getCSS())
+		
+		gridpos = gridpos + 1
+	end	
+
+	--then shipsys health gauges
+	for i,ctrl in ipairs(controlslist.syshealth) do
+		--print('%s in gpos: %s x:%s y:%s, w:%s, h:%s' %{ctrl, gridpos, grid[gridpos].x, grid[gridpos].y, grid[gridpos].width, grid[gridpos].height})
+  	shipsys.controls[ctrl] = {}
+		shipsys.controls[ctrl].obj = Geyser.Gauge:new({
+  		name = 'shipsys.controls.' .. ctrl .. '.obj',
+  		x = grid[gridpos].x, grid[gridpos].y,
+  		width = grid[gridpos].width, height = grid[gridpos].height,
+			orientation = 'vertical',
+  		}, shipsys.controls.container)
+		shipsys.controls[ctrl].obj:setText(ctrl:title())
+			
+		--shipsys.controls[ctrl].obj:setText(ctrl:title())
+		--shipsys.controls[ctrl].front:setStyleSheet(shipsys.css.front:getCSS())
+		--shipsys.controls[ctrl].back:setStyleSheet(shipsys.css.back:getCSS())
+		--shipsys.controls[ctrl].text:setStyleSheet(shipsys.css.text:getCSS())
+		
+		gridpos = gridpos + 1
+	end	
+	
+end
+
+--registerAnonymousEventHandler('sysLoadEvent', function() shipsys.draw() end )
+
+
+function shipsys.mode(mode)
+
+	if mode == 'on' then
+		--first we make space
+		lab.abar.container:hide()
+		lab.tbar.container:hide()
+	
+		-- just in case we haven't initialised the UI yet
+		if not shipsys.container then
+			shipsys.draw()
+		end
+		
+		--now we show the controls
+		shipsys.controls.container:show()
+		
+		--and adjust the sizes?
+	
+	elseif mode == 'off' then
+		lab.abar.container:show()
+		lab.tbar.container:show()
+		shipsys.controls.container:hide()
+	end
+
+end
+--shipsys.mode('off')</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Targeting Suite</name>
+								<packageName></packageName>
+								<script>shipsys = shipsys or {}
+shipsys.beacon = {}
+shipsys.targets = {}
+shipsys.weaponrange = 6
+shipsys.bearing = 'n'
+
+</script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Primary Target</name>
+									<packageName></packageName>
+									<script>shipsys.primary_target = 'none'
+
+function shipsys.setprimary(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	shipsys.primary_target = id
+	
+	shipsys.msg('Marking ' .. id .. ' as the primary target.')
+	
+end
+
+function shipsys.clearprimary()
+	shipsys.primary_target = 'none'
+	shipsys.msg('We no longer have a primary target sir')
+end
+
+function shipsys.isprimary(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	if shipsys.primary_target == id then
+		return true
+	else
+		return false
+	end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Target List</name>
+									<packageName></packageName>
+									<script>shipsys.targets = {}
+function shipsys.addtarget(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	
+	table.insert(shipsys.targets, id)
+	-- remove as friendly
+	local enemy = table.index_of(shipsys.allies, id)
+  if enemy &gt; 0 then
+    table.remove(shipsys.allies, enemy)
+  end
+	shipsys.msg('Marking ' .. id .. ' as a target.')
+	
+end
+
+function shipsys.remtarget(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	table.remove(shipsys.targets, table.index_of(shipsys.targets, id))
+	shipsys.msg('Letting ' .. id .. ' off... this time.')
+end
+
+function shipsys.istarget(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	if table.contains(shipsys.targets, id) then
+		return true
+	else
+		return false
+	end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Ally List</name>
+									<packageName></packageName>
+									<script>shipsys.allies = {}
+--
+
+function shipsys.addally(id)
+	local id = shipsys.getShipIdFromSlot(id)
+  -- mark as friendly
+  table.insert(shipsys.allies, id)
+  --
+  -- remove as enemy	
+  local enemy = table.index_of(shipsys.targets, id)
+  if enemy &gt; 0 then
+    table.remove(shipsys.targets, enemy)
+  end
+  --
+  shipsys.msg('Marking ' .. id .. ' as friendly.')
+end
+
+function shipsys.remally(id)
+	local id = shipsys.getShipIdFromSlot(id)
+  table.remove(shipsys.allies, table.index_of(shipsys.allies, id))
+  shipsys.msg(id .. " ain't no friend o' mine")
+end
+
+function shipsys.isally(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	if table.contains(shipsys.allies, id) then
+		return true
+	else
+		return false
+	end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>set neutral</name>
+									<packageName></packageName>
+									<script>function shipsys.setneutral(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	shipsys.remally(id)
+	shipsys.remtarget(id)
+	shipsys.msg('Designating: ' .. id .. ' as a neutral party.')
+end
+</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>getShip()</name>
+									<packageName></packageName>
+									<script>function shipsys.getShipInfo(id)
+	local id = shipsys.getShipIdFromSlot(id)
+	return shipsys.beacon[id] or false
+end
+
+function shipsys.getShipIdFromSlot(shipslot)
+	local slotnum
+	local shipslot = shipslot
+	
+	if type(shipslot) == 'number' then
+		return shipsys.slotlist[shipslot]
+	else
+		if shipslot:find('shipslot') then
+			shipslot = shipslot:gsub('shipslot', '')
+		else
+			return shipslot -- a string val without "shipslot" is simply the ID of the ship
+		end
+	end
+	print('shipslot: ' .. shipslot)
+	return shipsys.slotlist[tonumber(shipslot)] 
+	
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>inRange()</name>
+									<packageName></packageName>
+									<script>function shipsys.inRange(id, range)
+  local range = range or shipsys.weaponrange or 6
+  local ship = shipsys.getShipInfo(id)
+  --
+  if ship then
+    if ship.distance &gt; range then
+      return false
+    else
+      return true
+    end
+  else
+    return false
+    --ship out of range
+  end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>InFront()</name>
+									<packageName></packageName>
+									<script>function shipsys.inFront(id)
+	local cannon_dir = {
+		n = 	{ne=true, n=true, nw=true},
+		ne = 	{n=true, ne=true, e=true},
+		e = 	{ne=true, e=true, se=true},
+		se = 	{e=true, se=true, s=true},
+		s = 	{se=true, s=true, sw=true},
+		sw = 	{s=true, sw=true, w=true},
+		w = 	{sw=true, w=true, nw=true},
+		nw = 	{w=true, nw=true, n=true},
+	}
+	local bearing = shipsys.bearing
+	local ship = shipsys.getShipInfo(id)
+	local sight = ship.bearing
+
+	if cannon_dir[bearing][sight] then
+		return true
+	else
+		return false
+	end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>inCone()</name>
+									<packageName></packageName>
+									<script>function shipsys.inCone(id)
+	local result = false
+	if shipsys.inRange(id) and shipsys.inFront(id) then
+		result = true
+	end
+	return result
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Fake Beacon</name>
+									<packageName></packageName>
+									<script>shipsys.beacon['1234'] = {
+	x = 123,
+	y = 123,
+	distance = 16,
+	bearing = 'nw',
+	faction = 'Scatterhome',
+	id = '1234',
+	pilot = 'npc',
+} 
+
+shipsys.beacon['2345'] = {
+	x = 123,
+	y = 123,
+	distance = 12,
+	bearing = 'sw',
+	faction = 'Celestine',
+	id = '2345',
+	pilot = 'npc',
+} 
+
+shipsys.beacon['4321'] = {
+	x = 123,
+	y = 123,
+	distance = 4,
+	bearing = 'w',
+	faction = 'Celestine',
+	id = '4321',
+	pilot = 'npc',
+} 
+
+shipsys.beacon['5432'] = {
+	x = 123,
+	y = 123,
+	distance = 3,
+	bearing = 'nw',
+	faction = 'Celestine',
+	id = '5432',
+	pilot = 'npc',
+} 
+
+shipsys.lidar()</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>lidarUI()</name>
+									<packageName></packageName>
+									<script>function shipsys.lidarReportUI(win)
+  local win = win or 'lab.textmap'
+  local cols = shipsys.cols
+   
+  local order = {'npc', 'song', 'celestine', 'scatterhome'}
+	local dirconv = {northwest = 'nw', north = 'n', northeast = 'ne', east = 'e', southeast = 'se', south = 's', southwest = 'sw', west = 'w'}
+  --
+  echo(win, '\n')
+  local str = 'Sensor Suite &lt;%s&gt;'
+  cecho(win, '\n&lt;%s&gt;-- &lt;%s&gt;%s' % {cols.b, cols.h, str:format(cols.b):align('left', 60, '-')})
+  local lidar = shipsys.beacon or {}
+  display(lidar)
+  print(table.size(lidar))
+  if table.size(lidar) &gt; 0 then
+    for faction, ships in pairs(lidar) do
+      for id, ship in pairs(ships) do
+        print('Adding ship to target list.')
+        echo(win, '\n')
+        -- Echo the [ADD] link
+        local cmd = string.format([[shipsys.addtarget(%s)]], id)
+        local link = string.csqbr('ADD', cols)
+        cechoLink(win, link, cmd, 'Mark this ship for destruction.', true)
+        -- Echo the information
+				local tarlistcol = 'SteelBlue'
+				if table.contains(shipsys.targets, id) then tarlistcol = 'red' end
+        cecho(win, string.format(
+					" &lt;%s&gt;%s %s %s %s - %s", 
+					tarlistcol,  id:align('left', 5, ' '),
+					dirconv[ship.bearing]:align('left', 2, ' '),
+					tostring(ship.distance):align('left',2, ' '),
+					ship.faction:align('left', 10, ' '),
+					ship.pilot:align('left', 12, ' ')
+					)
+				)
+				--echo the [REMOVE} link
+        cmd = string.format([[shipsys.remtarget(%s)]], id)
+        link = string.csqbr('REMOVE', cols)
+        cechoLink(win, link, cmd, 'Leave the poor bastard alone.', true)
+      end
+    end
+  end
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>lidar()</name>
+									<packageName></packageName>
+									<script>function shipsys.lidar(win)
+	local win = win or 'lab.textmap'
+	local targets = shipsys.targets
+	local beacon = shipsys.beacon
+	local friendlies = shipsys.allies
+	shipsys.sorted_lidar = {}
+
+	local sort_order = {'targets', 'unmarked', 'friendlies',}
+	local sorted = {
+		targets_incone = {},
+		targets_inrange = {},
+		targets_inbeacon = {},
+		undesignated_incone = {},
+		undesignated_inrange = {},
+		undesignated_inbeacon = {},
+		friendlies_incone = {},
+		friendlies_inrange = {},
+		friendlies_inbeacon = {},
+		designated = {},
+		outofbeacon_targets = {},
+		outofbeacon_friendlies = {},
+	}
+
+	-- Sort all targets
+	for _,id in ipairs(targets) do
+		if shipsys.getShipInfo(id) then
+			if shipsys.inRange(id) then
+				if shipsys.inFront(id) then
+					table.insert(sorted.targets_incone, id)
+					sorted.designated[id] = true
+				else
+					table.insert(sorted.targets_inrange, id)
+					sorted.designated[id] = true
+				end
+			else
+				table.insert(sorted.targets_inbeacon, id)
+				sorted.designated[id] = true
+			end
+		else		
+			table.insert(sorted.outofbeacon_targets, id)
+		end
+	end
+
+	-- Sort all allies
+	for _,id in ipairs(friendlies) do
+		if shipsys.getShipInfo(id) then
+			if shipsys.inRange(id) then
+				if shipsys.inFront(id) then
+					table.insert(sorted.friendlies_incone, id)
+					sorted.designated[id] = true
+				else
+					table.insert(sorted.friendlies_inrange, id)
+					sorted.designated[id] = true
+				end
+			else
+				table.insert(sorted.friendlies_inbeacon, id)
+				sorted.designated[id] = true
+			end
+		else		
+			table.insert(sorted.outofbeacon_friendlies, id)
+		end
+	end
+
+
+	-- build list of undesignated
+	for id,ship in pairs(beacon) do
+		if not sorted.designated[id] then --ship is in beacon but unmarked
+			if shipsys.inRange(id) then
+				if shipsys.inFront(id) then
+					table.insert(sorted.undesignated_incone, id)
+					sorted.designated[id] = true
+				else
+					table.insert(sorted.undesignated_inrange, id)
+					sorted.designated[id] = true
+				end
+			else
+				table.insert(sorted.undesignated_inbeacon, id)
+				sorted.designated[id] = true
+			end
+		end
+	end
+	shipsys.sorted_lidar = sorted
+	
+	-- a master list
+	shipsys.slotlist = table.n_union(
+    sorted.targets_incone,
+    sorted.targets_inrange,
+    sorted.undesignated_incone,
+    sorted.undesignated_inrange,
+    sorted.targets_inbeacon,
+    sorted.undesignated_inbeacon,
+    sorted.friendlies_incone,
+    sorted.friendlies_inrange,
+    sorted.friendlies_inbeacon,
+    sorted.outofbeacon_targets,
+    sorted.outofbeacon_friendlies
+  )
+	raiseEvent('lidar updated')
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>lidar_report()</name>
+									<packageName></packageName>
+									<script>function shipsys.lidar_report(win)
+	local win = win or 'lab.textmap'
+	local lidar = shipsys.sorted_lidar
+	local sort_order = {'targets_incone', 'targets_inrange', 'undesignated_incone', 'undesignated_inrange',
+					'targets_inbeacon', 'undesignated_inbeacon', 
+					'friendlies_incone', 'friendlies_inrange', 'friendlies_inbeacon',
+					'outofbeacon_targets', 'outofbeacon_friendlies',
+	}
+	local edesignation = function(h)
+		fg('SteelBlue')
+		echo(win,'\n-- ' .. h .. ' ---------------------')
+		resetFormat()
+	end
+
+	local eship = function(ship, designation)
+		fg('cyan')
+		echo(win, string.format("\n  %s: [%s] Dist: %s ---- %s", ship.id, ship.bearing, ship.distance, designation))
+		resetFormat()
+	end	
+
+	echo(win, '\n')
+	for _,designation in ipairs(sort_order) do
+		edesignation(designation)
+		for _,shipid in ipairs(lidar[designation]) do
+			eship(shipsys.getShip(shipid), designation)
+		end
+	end
+	edesignation('---------')
+	echo(win,'\n')
+
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Ship Reports</name>
+									<packageName></packageName>
+									<script>function shipsys.shipReport(shipslot)
+	local slotnum = shipslot:gsub('shipslot', '')
+	if shipsys.slotlist[tonumber(slotnum)] then
+		shipsys.writeReport(shipslot)
+		return true
+	else
+		shipsys.clearReport(shipslot)
+		return false
+	end
+end
+
+function shipsys.clearReport(shipslot)
+	-- setmsg[2] to be cleared
+end
+
+function shipsys.writeReport(shipslot)
+	-- setmsg[2] with lots of info
+end</script>
+									<eventHandlerList />
+								</Script>
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Cockpit UI</name>
+							<packageName></packageName>
+							<script>cui = cui or {}
+
+cui.shipcss = CSSMan.new([[
+  background-color: rgba(0,0,0,100);
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: DimGrey;
+  margin: 3px;
+]])
+
+</script>
+							<eventHandlerList />
+							<Script isActive="yes" isFolder="no">
+								<name>starmap</name>
+								<packageName></packageName>
+								<script>--starmap
+cui = cui or {}
+cui.starmap = cui.starmap or {}
+
+function cui.starmap.draw(container)
+	local container = container or lab.titlebar.cont
+
+	cui.starmap.container = Geyser.Label:new({
+		name = 'cui.starmap.cont',
+		x = 25, y = '102%',
+		width = '-25px', height = '10%',
+		}, container)
+		
+	cui.starmap.console = Geyser.MiniConsole:new({
+		name = 'cui.starmap',
+		x = 3, 	y = 3,
+		width = '-3px',
+		font = 'LED DISPLAY7',
+		fontSize = 18,
+		height = '-3px',
+		color = 'black',
+	}, cui.starmap.container)
+	
+	local fw,fh = calcFontSize('cui.starmap')
+	local cw = fw*44
+	local ch = fh*44
+	cui.starmap.container:resize('-26px', ch)
+	local contw = cui.starmap.container:get_width()
+	local cx = (contw - cw) / 2
+	cui.starmap.console:resize(cw, '-5px' )
+	cui.starmap.console:move(cx,5)
+
+
+end		
+
+
+</script>
+								<eventHandlerList />
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Lidar</name>
+								<packageName></packageName>
+								<script>cui = cui or {}
+cui.lidar = cui.lidar or {}
+
+function cui.lidar.drawContainer(location)
+	cui.lidar.cont = Geyser.Container:new({name = 'cui.lidar.cont'})
+	GUIframe.addWindow(cui.lidar.cont, 'Lidar', location)
+end
+
+cui.lidar.drawContainer('bottomleft')</script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Draw Ship Containers</name>
+									<packageName></packageName>
+									<script>cui = cui or {}
+cui.lidar = cui.lidar or {}
+cui.lidar.ships = {}
+cui.lidar.shipamt = 6
+
+function cui.lidar.drawShipC()
+	local amt = cui.lidar.shipamt
+	local grid = calc_grid(amt,1)
+	for i=1,amt do
+		local dims = grid[i]
+		local ship = 'ship' .. str(i)
+		cui.lidar.ships[ship] = {}
+		cui.lidar.ships[ship].container = Geyser.Label:new({
+			name = 'lidar ship ' .. str(i),
+			x = dims.x, y = dims.y,
+			width = dims.width, height = dims.height,
+		}, cui.lidar.cont)
+		--cui.lidar.ships[ship].container:setStyleSheet(cui.shipcss:getCSS())
+	end
+end
+
+</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Draw Ship Details</name>
+									<packageName></packageName>
+									<script>cui = cui or {}
+cui.lidar = cui.lidar or {}
+
+function cui.lidar.drawShips()
+	local amt = cui.lidar.shipamt or 6
+	local grid = calc_grid(1,7)
+	
+	for i = 1,amt do
+		local ship = 'ship' .. str(i)
+		local shipslot = 'shipslot' .. str(i)
+		local container = cui.lidar.ships[ship].container
+		
+		-- Ally/Enemy/Other 
+		local dims = grid[1]
+		cui.lidar.ships[ship].attitude = abtn:new({
+			name = "cui.lidar.ships." .. ship .. '.attitude',
+			x = dims.x, y = dims.y, width = dims.w, height = dims.h,
+			multistate = 3,
+			listento = 'lidar updated',
+			msgs = {
+				[1] = 'Neutral',
+				[2] = 'Enemy',
+				[3] = 'Ally',
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'IndianRed',},
+				[3] = {['background-color'] = 'DarkOliveGreen',},
+			},
+			check = function() return (shipsys.istarget(shipslot) and 2) or (shipsys.isally(shipslot) and 3) or 1 end,
+			funcs = {
+				[1] = function() shipsys.addtarget(shipslot) end,
+				[2] = function() shipsys.addally(shipslot) end,
+				[3] = function() shipsys.setneutral(shipslot) end,
+			},
+		}, container)
+
+		-- Enemy/Targets prio up
+		local dims = grid[2]
+		cui.lidar.ships[ship].prioUP = abtn:new({
+			name = "cui.lidar.ships." .. ship .. '.prioUP',
+			x = dims.x, y = dims.y, width = dims.w, height = '50%',
+			id = str(i),
+			listento = 'lidar updated',
+			msgs = {
+				[1] = 'n/a',
+				[2] = 'UP',
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'DimGrey',},
+			},
+			check = function() return shipsys.istarget(shipslot) end,
+			funcs = {
+				[1] = function() end,
+				[2] = function() shipsys.setprio(shipslot, 1) end,
+			},
+		}, container)
+
+
+		-- Enemy/Targets prio down
+		local dims = grid[2]
+		cui.lidar.ships[ship].prioDOWN = abtn:new({
+			name = "cui.lidar.ships." .. ship .. '.prioDOWN',
+			x = dims.x, y = '50%', width = dims.w, height = '50%',
+			id = str(i),
+			listento = 'lidar updated',
+			msgs = {
+				[1] = 'n/a',
+				[2] = 'Down',
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'DimGrey',},
+			},
+			check = function() return shipsys.istarget(shipslot) end,
+			funcs = {
+				[1] = function() end,
+				[2] = function() shipsys.setprio(shipslot,-1) end,
+			},
+		}, container)
+		--]==]
+		-- Set Primary Target
+		local dims = grid[2]
+		cui.lidar.ships[ship].setprimarytar = abtn:new({
+			name = "cui.lidar.ships." .. ship .. '.setprimarytar',
+			x = dims.x, y = dims.y, width = dims.w, height = dims.h,
+			listento = 'lidar updated',
+			msgs = {
+				[1] = 'Set as&lt;br&gt;primary&lt;br&gt;target',
+				[2] = 'Primary&lt;br&gt;Target',
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'IndianRed',},
+			},
+			check = function() return shipsys.isprimary(shipslot) end,
+			funcs = {
+				[1] = function() shipsys.setprimary(shipslot) end,
+				[2] = function() shipsys.removeprimary(shipslot) end,
+			},
+		}, container)
+		--
+
+		-- is in range?
+		local dims = grid[3]
+		cui.lidar.ships[ship].inrange = abtn:new({
+			name = "cui.lidar.ships." .. ship .. '.inrange',
+			x = dims.x, y = dims.y, width = dims.w, height = dims.h,
+			listento = 'lidar updated',
+			msgs = {
+				[1] = 'Out of&lt;br&gt;range',
+				[2] = 'Target in&lt;br&gt;Range',
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'DarkOliveGreen',},
+			},
+			check = function() return shipsys.inRange(shipslot) end,
+			funcs = {
+				[1] = function()  end,
+				[2] = function()  end,
+			},
+		}, container)
+
+		-- is in cone?
+		local dims = grid[4]
+		cui.lidar.ships[ship].incone = abtn:new({
+			name = "cui.lidar.ships." .. ship .. '.incone',
+			x = dims.x, y = dims.y, width = dims.w, height = dims.h,
+			listento = 'lidar updated',
+			msgs = {
+				[1] = 'Out of&lt;br&gt;cone',
+				[2] = 'Target in&lt;br&gt;cone',
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'DarkOliveGreen',},
+			},
+			check = function() return shipsys.inCone(shipslot) end,
+			funcs = {
+				[1] = function()  end,
+				[2] = function()  end,
+			},
+		}, container)
+
+		-- General Info
+		local dims = grid[5]
+		cui.lidar.ships[ship].info = abtn:new({
+			name = "cui.lidar.ships." .. ship .. '.info',
+			x = dims.x, y = dims.y, width = mathpercent(dims.w, '*', 3), height = dims.h,
+			listento = 'lidar updated',
+			msgs = {
+				[1] = 'Ship Name, ID, Pilot, Faction',
+				[2] = 'Real Info here',
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'DimGrey',},
+				[2] = {['background-color'] = 'black',},
+			},
+			check = function() return shipsys.shipReport(shipslot) end,
+			funcs = {
+				[1] = function()  end,
+				[2] = function()  end,
+			},
+		}, container)
+		--]=]
+	end	
+end</script>
+									<eventHandlerList />
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Draw it all</name>
+									<packageName></packageName>
+									<script>cui.lidar.drawShipC()
+cui.lidar.drawShips()</script>
+									<eventHandlerList />
+								</Script>
+							</Script>
+							<Script isActive="yes" isFolder="no">
+								<name>Flight Controls</name>
+								<packageName></packageName>
+								<script></script>
+								<eventHandlerList />
+								<Script isActive="yes" isFolder="no">
+									<name>Gunner</name>
+									<packageName></packageName>
+									<script>cui.gunner = cui.gunner or {}
+
+function cui.gunner.drawC(height)
+  local container = cui.controls.cont
+  
+  cui.gunner.cont = Geyser.Label:new({
+    name = 'cui.gunner.cont',
+    x = 0, y = 0, 
+    width = '100%', 
+    height = height or '50%',
+    }, container)
+    
+    cui.gunner.cont:setStyleSheet(cui.shipcss:getCSS())
+  
+end
+</script>
+									<eventHandlerList />
+									<Script isActive="yes" isFolder="no">
+										<name>New script</name>
+										<packageName></packageName>
+										<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+</script>
+										<eventHandlerList />
+									</Script>
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Pilot</name>
+									<packageName></packageName>
+									<script>cui.pilot = cui.pilot or {}
+
+function cui.pilot.drawContainer(location)
+  local location  = location or 'bottomleft'
+	cui.pilot.cont = Geyser.Container:new({name = 'cui.pilot.cont'})
+	GUIframe.addWindow(cui.pilot.cont, 'Pilot', location)
+
+  --cui.pilot.cont:setStyleSheet(cui.shipcss:getCSS())  
+end
+
+
+cui.compass = cui.compass or {}
+function cui.compass.draw(x,y,w,h,container)
+
+  cui.compass.cont = Geyser.Container:new({x = x, y = y, width = w, height = h,}, container)
+  local grid = calc_grid(3,3)
+  local dirs = {'nw', 'n', 'ne', 'w', 'beacon', 'e', 'sw', 's', 'se'}
+  cui.compass.btns = {}
+  for i,dir in ipairs(dirs) do
+    local dims = grid[i]
+    local bname = 'cui.compass.btns.' .. dir
+    
+    -- define the abtns
+    if dirs[i] == 'beacon' then
+      cui.compass.btns[dir] = abtn:new({
+			name = bname,
+			x = dims.x, y = dims.y, width = dims.w, height = dims.h,
+			--listento = 'compass updated',
+			msgs = {
+				[1] = dir:upper(),
+				[2] = dir:upper(),
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'black',},
+			},
+			--check = function() return shipsys.inRange(shipslot) end,
+			funcs = {
+				[1] = function() send('ship beacon') end,
+				[2] = function() send('ship beacon') end,
+			},
+		}, container) 
+    else
+      cui.compass.btns[dir] = abtn:new({
+			name = bname,
+			x = dims.x, y = dims.y, width = dims.w, height = dims.h,
+			--listento = 'compass updated',
+			msgs = {
+				[1] = dir:upper(),
+				[2] = dir:upper(),
+			},
+			cssman = {
+				default = cui.shipcss,
+				[1] = {['background-color'] = 'black',},
+				[2] = {['background-color'] = 'DarkOliveGreen',},
+			},
+			--check = function() return shipsys.inRange(shipslot) end,
+			funcs = {
+				[1] = function() send('ship turn ' .. dir) end,
+				[2] = function() send('ship turn ' .. dir) end,
+			},
+		}, container)
+    end
+  end
+  
+    
+
+
+
+
+
+end</script>
+									<eventHandlerList />
+									<Script isActive="yes" isFolder="no">
+										<name>New script</name>
+										<packageName></packageName>
+										<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+</script>
+										<eventHandlerList />
+									</Script>
+								</Script>
+								<Script isActive="yes" isFolder="no">
+									<name>Engineer</name>
+									<packageName></packageName>
+									<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+</script>
+									<eventHandlerList />
+									<Script isActive="yes" isFolder="no">
+										<name>New script</name>
+										<packageName></packageName>
+										<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+</script>
+										<eventHandlerList />
+									</Script>
+								</Script>
+							</Script>
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>testcsss</name>
+							<packageName></packageName>
+							<script>--[=[
+testCSS = CSSMan.new([[
+	background-color: rgba(0,0,0,0);
+	border-style: solid;
+	border-color: DimGrey;
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 5px;
+	background-image: url(C:/Users/brett/Dropbox/Starmourn/imgs/laser-turret.png);
+]])
+
+local img = [[url("C:/Users/brett/Dropbox/Starmourn/imgs/laser-turret.png")]]
+
+
+--testCSS:set('background-image', img)
+
+testlab:setStyleSheet( testcss:getCSS() )
+
+testcss:set('background-color', 'sienna')
+--testlab:setStyleSheet( testCSS:getCSS() )
+
+
+
+testlab:setStyleSheet( testcss:getCSS() )
+--
+testcss = CSSMan.new([[
+	border-style: solid;
+	background-color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0.6 rgba(27, 28, 28, 255), stop:0.99 rgba(126, 126, 129, 255));
+	border-color: sienna;
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 2px;
+	background-image: url(C:/Users/brett/Dropbox/Starmourn/imgs/baseline_arrow_upward_white_36dp.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	]])
+	]=]--</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>testlabel</name>
+							<packageName></packageName>
+							<script>--testlab = Geyser.Label:new({'testlabel', x = '70%', y = '15%', width = 80, height = 80})
+
+--testlab:setBackgroundImage("C:/Users/brett/Dropbox/Starmourn/imgs/laser-turret.png")
+
+--
+--testlab3:setStyleSheet( testcss:getCSS() )
+
+--print(testcss:get('background-image'))
+
+--testcss:set('background-image', "url(C:/Users/brett/Dropbox/Starmourn/imgs/laser-turret60x60.png)")
+
+
+
+--print(testcss:get('background-image'))
+
+
+--testlab3:setStyleSheet( testcss:getCSS() )
+
+
+--[[
+	border-style: solid;
+	background-color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0.6 rgba(27, 28, 28, 255), stop:0.99 rgba(126, 126, 129, 255));
+	border-color: sienna;
+	border-width: 2px;
+	border-radius: 2px;
+	margin: 2px;
+	background-image: url(C:/Users/brett/Dropbox/Starmourn/imgs/baseline_arrow_upward_white_36dp.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	]]--)
+	</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>displayColors</name>
+							<packageName></packageName>
+							<script>-- internal sorting function, sorts first by hue, then luminosity, then value
+local sortColorsByHue =
+  function(lhs, rhs)
+    local lh, ll, lv = unpack(lhs.sort)
+    local rh, rl, rv = unpack(rhs.sort)
+    if lh &lt; rh then
+      return true
+    elseif lh &gt; rh then
+      return false
+    elseif ll &lt; rl then
+      return true
+    elseif ll &gt; rl then
+      return false
+    else
+      return lv &lt; rv
+    end
+  end
+-- internal sorting function, removes _ from snake_case and compares to camelCase
+local sortColorsByName =
+  function(a, b)
+    local aname = string.gsub(string.lower(a.name), "_", "")
+    local bname = string.gsub(string.lower(b.name), "_", "")
+    return aname &lt; bname
+  end
+-- internal function used to turn sorted colors table into columns
+local chunkify =
+  function(tbl, num_chunks)
+    local pop =
+      function(t)
+        return table.remove(t, 1)
+      end
+    local tbl = table.deepcopy(tbl)
+    local tblsize = #tbl
+    local base_chunk_size = tblsize / num_chunks
+    local chunky_chunks = tblsize % num_chunks
+    local chunks = {}
+    for i = 1, num_chunks do
+      local chunk_size = base_chunk_size
+      if i &lt;= chunky_chunks then
+        chunk_size = chunk_size + 1
+      end
+      local chunk = {}
+      for j = 1, chunk_size do
+        chunk[j] = pop(tbl)
+      end
+      chunks[i] = chunk
+    end
+    return chunks
+  end
+-- internal function, converts rgb to hsv
+-- found at https://github.com/EmmanuelOga/columns/blob/master/utils/color.lua#L89
+local rgbToHsv =
+  function(r, g, b)
+    r, g, b = r / 255, g / 255, b / 255
+    local max, min = math.max(r, g, b), math.min(r, g, b)
+    local h, s, v
+    v = max
+    local d = max - min
+    if max == 0 then
+      s = 0
+    else
+      s = d / max
+    end
+    if max == min then
+      h = 0
+      -- achromatic
+    else
+      if max == r then
+        h = (g - b) / d
+        if g &lt; b then
+          h = h + 6
+        end
+      elseif max == g then
+        h = (b - r) / d + 2
+      elseif max == b then
+        h = (r - g) / d + 4
+      end
+      h = h / 6
+    end
+    return h, s, v
+  end
+-- internal stepping function, removes some of the noise for a more pleasing sort
+-- cribbed from the python on https://www.alanzucconi.com/2015/09/30/colour-sorting/
+local step =
+  function(r, g, b)
+    local lum = math.sqrt(.241 * r + .691 * g + .068 * b)
+    local reps = 8
+    local h, s, v = rgbToHsv(r, g, b)
+    local h2 = math.floor(h * reps)
+    local lum2 = math.floor(lum * reps)
+    local v2 = math.floor(v * reps)
+    if h2 % 2 == 1 then
+      v2 = reps - v2
+      lum2 = reps - lum2
+    end
+    return h2, lum2, v2
+  end
+
+local function calc_luminosity(r, g, b)
+  r = r &lt; 11 and r / (255 * 12.92) or ((0.055 + r / 255) / 1.055) ^ 2.4
+  g = g &lt; 11 and g / (255 * 12.92) or ((0.055 + g / 255) / 1.055) ^ 2.4
+  b = b &lt; 11 and b / (255 * 12.92) or ((0.055 + b / 255) / 1.055) ^ 2.4
+  return (0.2126 * r) + (0.7152 * g) + (0.0722 * b)
+end
+
+local function include(color, options)
+  if options.removeDupes then
+    if string.find(color, "_") or string.find(color:lower(), 'gray') then
+      return false
+    else
+      return true
+    end
+  else
+    if string.find(color, "ansi_%d%d%d") then
+      return false
+    else
+      return true
+    end
+  end
+end
+
+local function echoColor(color, options)
+  local rgb = color.rgb
+  local fgc = "white"
+  if calc_luminosity(unpack(rgb)) &gt; 0.5 then
+    fgc = "black"
+  end
+  local colorString
+  if options.justText then
+    colorString = string.format('&lt;%s:%s&gt; %-23s&lt;reset&gt; ', color.name, 'black', color.name, spacer)
+  else
+    colorString = string.format('&lt;%s:%s&gt; %-23s&lt;reset&gt; ', fgc, color.name, color.name)
+  end
+  if options.window == "main" then
+    if options.echoOnly then
+      cecho(colorString)
+    else
+      cechoLink(
+        colorString,
+        [[appendCmdLine("]] .. color.name .. [[")]],
+        table.concat(rgb, ", "),
+        true
+      )
+    end
+  else
+   if options.echoOnly then
+      cecho(options.window, colorString)
+    else
+      cechoLink(
+        options.window,
+        colorString,
+        [[appendCmdLine("]] .. color.name .. [[")]],
+        table.concat(rgb, ", "),
+        true
+      )
+    end
+  end
+end
+
+function displayColors(options)
+  local options = options or {}
+  local optionsType = type(options)
+  assert(
+    optionsType == "table",
+    "displayColors(options) argument error: options as table expects, got " .. optionsType
+  )
+  options.cols = options.cols or 4
+  options.search = options.search or ""
+  options.sort = options.sort or false
+  if options.removeDupes == nil then
+    options.removeDupes = true
+  end
+  if options.columnSort == nil then
+    options.columnSort = true
+  end
+  if type(options.window) == "table" then
+    options.window = options.window.name
+  end
+  options.window = options.window or "main"
+  local color_table = options.color_table or color_table
+  local cols, search, sort = options.cols, options.search, options.sort
+  local colors = {}
+  for k, v in pairs(color_table) do
+    local color = {}
+    color.rgb = v
+    color.name = k
+    color.sort = {step(unpack(v))}
+    if include(k, options) and k:lower():find(search) then
+      table.insert(colors, color)
+    end
+  end
+  if sort then
+    table.sort(colors, sortColorsByName)
+  else
+    table.sort(colors, sortColorsByHue)
+  end
+  if options.columnSort then
+    local columns_table = chunkify(colors, cols)
+    local lines = #columns_table[1]
+    for i = 1, lines do
+      for j = 1, cols do
+        local color = columns_table[j][i]
+        if color then
+          echoColor(color, options)
+        end
+      end
+      echo(options.window, "\n")
+    end
+  else
+    local i = 1
+    for _, k in ipairs(colors) do
+      echoColor(k,options)
+      if i == cols then
+        echo(options.window, "\n")
+        i = 1
+      else
+        i = i + 1
+      end
+    end
+    if i ~= 1 then
+      echo(options.window, "\n")
+    end
+  end
+end</script>
+							<eventHandlerList />
+						</Script>
+						<Script isActive="yes" isFolder="no">
+							<name>Logger</name>
+							<packageName></packageName>
+							<script>lab = lab or {}
+gamelogging = gamelogging or false
+
+function lab.drawlogtoggle(container)
+  local dims = {x = '-18%', y = '0%', width = '16%', height = '200%',}
+  lab.logtoggle =
+    abtn:new(
+      {
+        name = 'lab.logtoggle',
+        x = dims.x,
+        y = dims.y,
+        width = dims.width,
+        height = dims.height,
+        cssman =
+          {
+            default = lab.actionbtn,
+            [1] = {['background-color'] = 'DarkSlateGrey', ['border-color'] = 'DimGrey'},
+            [2] = {['background-color'] = 'SeaGreen', ['border-color'] = 'LawnGreen'},
+          },
+        msgs = {[1] = 'Logging&lt;br&gt;Off',[2] = 'Logging&lt;br&gt;On'},
+        
+        listento = 'ui tick',
+        check =
+          function()
+            return gamelogging
+          end,
+        funcs =
+          {
+            [1] =
+              function()
+                startLogging(false)
+                startLogging(true)
+                gamelogging = true
+              end,
+            [2] =
+              function()
+                startLogging(false)
+                gamelogging = false
+              end,
+          },
+      },
+      container
+    )
+end</script>
+							<eventHandlerList />
+						</Script>
+					</ScriptGroup>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>CSS</name>
+					<packageName></packageName>
+					<script>balsys.myCss1 = [[
+border-width: 4px;
+border-radius: 7;
+border-color: DimGrey;
+margin: 5px;
+background-color: qlineargradient(spread:pad, x1:0, y1:0.972, x2:1, y2:0.023, stop:0 rgba(36, 100, 61, 155), stop:0.704545 rgba(142, 142, 79, 150));
+]]
+balsys.myCss2 = [[
+margin: 5px;
+background-color: rgba(0,0,0,0);
+]]
+--demonnic.anitimer:new("Test2", {x = 0, y="50%", height = 20, width = "100%"}, 10, {container = demonnic.newContainer, showTime = true, timerCaption = "Test2", cssFront = myCss1, cssBack = myCss2})
+--
+--background-color: rgba(10,200,10,100);</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>Balsys test</name>
+					<packageName></packageName>
+					<script>bal = balsys:create('balance', true, true, 0.75)</script>
+					<eventHandlerList />
+				</Script>
+			</ScriptGroup>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>Attempt</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+eff = {}
+
+eff.dff = false
+
+function eff.func()
+  eff.dff = false
+  print(tostring(eff.dff))
+  loadstring([[_G.eff.dff = true]])()
+  --_G.eff.dff = true
+  print(tostring(eff.dff))
+ end</script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>Channel v1</name>
+					<packageName></packageName>
+					<script>q = q or {}
+q.ids = q.ids or {}
+q.defaultTimeout = 1 --adjust this to suit your worst average latency
+
+function q.channel(cmd, qconftrig, conftrig, flag, timeout, onfail)
+	local onfail = onfail or false --onfail is an optional argument
+	local timeout = timeout or q.defaultTimeout --timeout is an optional argument
+
+	-- make sure we're starting from a blank state
+	if q.ids[cmd] then
+		q.killTriggers(cmd)
+		q.killTimers(cmd)
+	end
+	q.ids[cmd] = {}
+
+	-- create the triggers which confirm success
+	q.ids[cmd].qconf = tempTrigger(qconftrig, function(cmd, flag) q.confirm(cmd, flag) end, 1) -- trig for ingame queue
+	q.ids[cmd].conf = tempTrigger(conftrig, function(cmd, flag) q.confirm(cmd, flag) end, 1) -- trig for ability usage
+
+	-- create the timer which determines a failed attempt
+  local func 
+  if onfail then 
+    func = string.format([[q.failed('%s', '%s', '%s')]], cmd, flag, onfail  )
+  else
+    func = string.format([[q.failed("%s", "%s")]], cmd, flag  )
+  end
+	q.ids[cmd].timer = tempTimer(timeout, func)
+
+--  q.ids[cmd].timer = tempTimer(timeout, function(cmd, flag) q.failed(cmd, flag) end)
+
+	-- send command and set the variable to true, for your other scripts
+	send(cmd)
+  q.setflag(flag, true)
+
+	--_G[flag] = true
+  
+end
+
+--[=[
+	local s = [[_G.%s.onclickfunc()]] %{btn}
+	--print(s)
+	loadstring(s)()
+--]=]
+
+
+
+function q.setflag(flag, bool)
+  local s = string.format([[_G.%s = %s]], flag, tostring(bool) ) 
+  loadstring(s)()
+end
+
+
+
+
+function q.failed(cmd, flag, ontimeout)
+  local cmd = cmd or 'nil cmd'
+ -- print('q.failed: ' .. cmd .. ' flag: ' .. flag)
+	q.killTriggers(cmd)
+	q.killTimers(cmd) --not currently necessary, but included if future versions have 2 timers
+  
+  --print('++ Everything killed ++')
+  
+	q.setflag(flag, false)
+
+	-- any function we which to run on a timeout
+	if ontimeout then
+		ontimeout()
+	end
+end
+
+
+function q.confirm(cmd, flag)
+	q.killTriggers(cmd)
+	q.killTimers(cmd)
+	q.setflag(flag, true)
+end
+	
+function q.killTriggers(cmd)
+ -- print("---- killTriggers called ----")
+  --print('killTriggers: ' .. cmd)
+	if q.ids[cmd].conf then
+ --   print('   killing conf')
+		killTrigger(q.ids[cmd].conf)
+	end
+	if q.ids[cmd].qconf then 
+ --   print('killing qconf')
+		killTrigger(q.ids[cmd].qconf)
+	end
+end
+
+function q.killTimers(cmd)
+--  print('---- q.killTimers ----')
+	if q.ids[cmd].timer then
+ --   print('killing timer')
+		killTimer(q.ids[cmd].timer)
+	end
+end
+
+</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>test channel</name>
+					<packageName></packageName>
+					<script>testch = testch or {}
+testch.deflecting = false
+testch.protecting = false
+
+function testch.deflect()
+  print('deflecting: ' .. tostring(testch.deflecting))
+  q.channel(
+    'mwp protect',
+    "[Queue]: You will attempt to do MWP DEFLECT when you recover balance.",
+    "You: MWP Deflect.",
+    "testch.protecting"
+    )
+  print('deflecting: ' .. tostring(testch.deflecting))
+end
+
+
+function testcrash(dir)
+  print('beginning crash to the: ' .. dir)
+  
+  
+
+
+end</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>Timeout</name>
+					<packageName></packageName>
+					<script>timeout = timeout or {}
+--testtimeout = nil
+
+
+
+function timeout.start(name, time, v1, v2, ontimeout)
+  if timeout[name] then
+    timeout.kill(name)
+  end
+  
+  --[[if type(name) ~= 'string' then error('timeout.start param 1 is wrong type. Needs to be string.') end
+  if type(time) ~= 'number' then error('timeout.start param 2 is wrong type. Needs to be a number.') end
+  if type(flag) ~= 'string' then error('timeout.start param 3 is wrong type. Needs to be a string, variable/table reference enclosed in quotes.') end
+  if type(goofy) ~= 'boolean' then error('timeout.start param 4 is wrong type. Needs to be boolean, false for normal behaviour, true for opposite.') end
+  if type(ontimeout) ~= 'function' then error('timeout.start param 5 is wrong type. Needs to be function: function() --your code here end') end
+ --]]
+  
+  timeout[name] = {}
+  timeout[name].v1 = v1 -- value before attempt
+  timeout[name].v2 = v2 -- value during attempt
+  timeout[name].time = time
+  timeout[name].ontimeout = ontimeout
+  
+  local func = string.format([[timeout.timeout('%s')]], name)
+  
+  timeout[name].timer =
+    tempTimer(
+      time,
+      func
+    )
+  timeout.setflag(name, true)
+end
+
+function timeout.setflag(name, mode)
+  --print('testtimeout: ' .. tostring(testtimeout))
+  local bool = mode
+  if timeout[name] then
+    if timeout[name].goofy then
+      bool = not bool
+    end
+    loadstring(string.format("_G.%s = %s", timeout[name].flag, tostring(bool)))()
+  end
+  --print('testtimeout: ' .. tostring(testtimeout))
+end
+
+function timeout.timeout(name)
+  if timeout[name] then
+    timeout.setflag(name, false)
+    if timeout[name].ontimeout then
+      timeout[name].ontimeout()
+    end
+    timeout.kill(name)
+  end
+end
+
+function timeout.kill(name)
+  if timeout[name] then
+    if timeout[name].timer then
+      killTimer(timeout[name].timer)
+    end
+    timeout[name] = nil
+  end
+end</script>
+					<eventHandlerList />
+				</Script>
+			</ScriptGroup>
+		</ScriptGroup>
+	</ScriptPackage>
+	<KeyPackage>
+		<KeyGroup isActive="yes" isFolder="yes">
+			<name>Personal</name>
+			<packageName></packageName>
+			<script></script>
+			<command></command>
+			<keyCode>-1</keyCode>
+			<keyModifier>-1</keyModifier>
+		</KeyGroup>
+	</KeyPackage>
+	<HelpPackage>
+		<helpURL></helpURL>
+	</HelpPackage>
+</MudletPackage>

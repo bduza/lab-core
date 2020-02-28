@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<TriggerPackage>
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>Scoundrel</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="yes" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Tripwire Gate</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Concealing a</string>
+					<string>you connect a long, nearly invisible filiment of wire to it and stretch it in front of the</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+					<integer>0</integer>
+				</regexCodePropertyList>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>The Exit</name>
+					<script>local dir = matches[2]
+local conv = {above = 'up', below = 'down'}
+dir = conv[dir] or dir
+
+if tripwire.lastmod then
+  tripwire.mark(dir, tripwire.lastied, tripwire.lastmod)
+else
+  tripwire.mark(dir, tripwire.lastied)
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#00ffff</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>(\w+) exit\.$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
+		</TriggerGroup>
+	</TriggerPackage>
+	<TimerPackage />
+	<AliasPackage>
+		<AliasGroup isActive="no" isFolder="yes">
+			<name>Scoundrel</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>Set Tripwire</name>
+				<script>local dir = matches[2]
+local ied = matches[3]
+local mod = matches[4] or ''
+
+
+tripwire.lastied = ied
+if matches[4] then
+  tripwire.lastmod = mod
+end
+
+send(string.format("ied tripwire %s %s %s", ied, mod, dir))</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^tw (\w+) (\w+)(?: (\w+))?$</regex>
+			</Alias>
+		</AliasGroup>
+	</AliasPackage>
+	<ActionPackage />
+	<ScriptPackage>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>Scoundrel</name>
+			<packageName></packageName>
+			<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>Mark Tripwire</name>
+				<packageName></packageName>
+				<script>tripwire = tripwire or {}
+tripwire.timeout = 10 --15 * 60
+tripwire.lastied = tripwire.lastied or false
+tripwire.lastmod = tripwire.lastmod or false
+
+function tripwire.mark(dir, ied, mod)
+  --print('tripwire.mark called')
+  local ied = ied or tripwire.lastied
+  local mod = mod or tripwire.lastmod or 'normal'
+  local roomID = getPlayerRoom()
+  local nearbyRooms = getRoomExits(roomID)
+  local sdir = mmp.anytoshort(dir)
+  local ldir = mmp.anytolong(dir)
+  ----
+  cecho(string.format("\n&lt;sienna&gt; Marking the %s %s tripwire on your map.", mod, ied))
+  addCustomLine(roomID, nearbyRooms[ldir], sdir, tripwire.styles[mod], tripwire.cols[ied], false)
+  tripwire.set_timeout(dir, roomID)
+  
+  --tripwire.lastied = false
+ -- tripwire.lastmod = false
+end
+
+function tripwire.remove(dir, roomID)
+  local roomID = roomID or getPlayerRoom()
+  cecho(string.format("\n&lt;sienna&gt; Removing the tripwire on your map from %s in the %s direction.", tostring(roomID), dir))
+  local sdir = mmp.anytoshort(dir)
+  local ldir = mmp.anytolong(dir)
+  ----
+  removeCustomLine(roomID, sdir)
+  tripwire.end_timeout(dir, roomID)
+end
+
+--------------
+--HELPERS ----
+tripwire.ids = tripwire.ids or {}
+
+function tripwire.set_timeout(dir, roomID)
+  local timeout = tripwire.timeout
+  local id = tostring(roomID)
+  tripwire.ids[id] = tripwire.ids[id] or {}
+  if tripwire.ids[id][dir] then
+    cecho(string.format("\n&lt;sienna&gt; First we kill the existing timer for the tripwire on your map from %s in the %s direction.", id, dir))
+    tripwire.remove(dir, roomID)
+  end
+  cecho(string.format("\n&lt;sienna&gt; Setting a timer for the tripwire on your map from %s in the %s direction.", id, dir))
+  tripwire.ids[id][dir] = tempTimer(timeout, function() tripwire.remove(dir, roomID) end )
+end
+
+function tripwire.end_timeout(dir, roomID)
+  local id = tostring(roomID)
+  cecho(string.format("\n&lt;sienna&gt; Killing the timer for the tripwire on your map from %s in the %s direction.", id, dir))
+  if tripwire.ids[id][dir] then
+    killTimer(tripwire.ids[id][dir])
+    tripwire.ids[id][dir] = false
+  end
+end
+
+tripwire.cols = {
+    ripper = {255, 0, 0},
+    melter = {0, 255, 0},
+    piercer = {255, 215, 0},
+    sleeper = {147, 112, 219},
+    pusher = {255, 140, 0},
+    zapper = {0, 255, 255},
+    blinder = {160, 82, 45},
+    choker = {244, 164, 96},
+  }
+tripwire.styles = {
+    normal = 'solid line', 
+    shrapnel = 'dash line', 
+    wiring = 'dot line', 
+    timer = 'dash dot line'
+  }
+  
+ 
+
+--</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
+	</ScriptPackage>
+	<KeyPackage />
+	<HelpPackage>
+		<helpURL></helpURL>
+	</HelpPackage>
+</MudletPackage>
